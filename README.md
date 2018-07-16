@@ -15,5 +15,5 @@ Rays are defined by their propagation direction and stokes parameters (intensity
 For geometries without random scattering (i.e. no Rayleigh scattering and no diffuse reflectors) the program can be run with or without Monte Carlo style dice rolling.  E.g., at a dielectric interface, you can choose to follow both the reflected and refracted ray (so the number of tracked rays increases as the simulation proceeds), or to roll the dice according to the relative intensities and follow only one ray.  For diffuse reflection or Rayleigh scattering (or any other process where there is a continuous angular distribution) only Monte Carlo style simulation is possible.
 
 Supported platforms:
-  MATLAB
-  working on a numpy version
+ - MATLAB
+ - working on a numpy version
