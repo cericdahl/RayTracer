@@ -288,6 +288,7 @@ p_start = ray_startingpoints;
 incoming_rays = rays;
 ray_index = (1:numrays)';
 smix_last = ones(numrays, 1);
+six_last = zeros(size(p_start,1),1);
 
 %%  follow rays
 num_scatters = 0;
@@ -341,7 +342,7 @@ while ~isempty(ray_index)
             ( s_orientation ~= 0 ) & ...
             ( ~isnan(l_ray) ) & ...
             ( l_ray < inf ) & ...
-            ( l_ray > min_travel_length );
+            (l_ray > repmat(min_travel_length*(six_last==n),1,size(l_ray,2)) );
         l_ray(~valid_intersection) = inf;
         [l_ray,  ix] = min(l_ray, [], 2);
         
@@ -577,6 +578,8 @@ while ~isempty(ray_index)
     % for rays that escape the geometry in the next step
     smix_last = [-smix_next(refracted_rays_to_follow) ; ...
         smix_next(reflected_rays_to_follow)];
+    six_last = abs([six_next(refracted_rays_to_follow) ; ...
+        six_next(reflected_rays_to_follow)]);
     % identify reflected rays with a negative ray_index (refracted rays
     % also inhered the negative index if they have previously been
     % reflected)
