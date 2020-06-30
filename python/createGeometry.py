@@ -610,6 +610,29 @@ def createGeometry(gs):
     viewportRetainer.absorption = 1
     surface_list.append(viewportRetainer)
 
+    dummyplane = surface.surface()
+    dummyplane.description = 'xy plane with 10cm radius disc cutout'
+    dummyplane.shape = 'plane'
+    dummyplane.param_list = [np.array([0,0,0]), np.array([0,0,1])] # xy-plane
+    dummyplane.inbounds_function = lambda p:np.reshape((p[:,1,:]*p[:,1,:]+p[:,2,:]*p[:,2,:]) < 100, (np.size(p,0),-1)) # 10cm disc
+    dummyplane.n_outside = gs.n_pressurewall
+    dummyplane.n_inside = gs.n_pressurewindow
+    dummyplane.surface_type = 'normal'
+    dummyplane.absorption = 1
+#    surface_list.append(dummyplane)
+
+    dummycyl = surface.surface()
+    dummycyl.description = '10-cm radius cylinder along z axis from z=0 to z=5'
+    dummycyl.shape = 'cylinder'
+    dummycyl.param_list=[np.array([0,0,0]), np.array([0,0,1]), np.array([10])]
+    dummycyl.inbounds_function = lambda p:np.reshape((p[:,3,:] > 0) * (p[:,3,:] < 5), (np.size(p,0),-1))
+    dummycyl.n_outside = n_pressurewall
+    dummycyl.n_inside = gs.n_hydraulic
+    dummycyl.surface_type = 'normal'
+    dummycyl.absorption = 1
+#    surface_list.append(dummycyl)
+    
+    
     nippleBottom = surface.surface()
     nippleBottom.description = 'nipple bottom'
 #    surface_list(end).intersect_function = @(sp,indir)RayToPlane(sp,indir, ...
