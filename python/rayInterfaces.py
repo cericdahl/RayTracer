@@ -1,7 +1,7 @@
 # define ray_interfaces struct
 class rayInterfaces(object):
     def __init__(self):
-    	#attributes
+        # attributes
         self.incoming_ray = None
         self.reflected_ray = None
         self.refracted_ray = None
@@ -16,4 +16,3 @@ class rayInterfaces(object):
         self.bulkabs_transmitted = None
         self.rayleigh_incident = None
         self.rayleigh_transmitted = None
-	

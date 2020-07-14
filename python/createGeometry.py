@@ -60,7 +60,7 @@ import geospecs
 #function [surface_list, rays, ray_startingpoints, pixels] = CreateArBCGeometry_WithLights_Split(geospecs)
 def createGeometry(gs):
     #I don't know what this does, why would geospecs ever be empty
-    #and why do you ahve to
+    #and why do you have to
     # # %% set defaults
     # if nargin<1 || isempty(geospecs) || ~isstruct(geospecs)
     #     geospecs = struct();
@@ -383,7 +383,7 @@ def createGeometry(gs):
     outsideOuterHemi.inbounds_function = lambda p:np.reshape((p[:,2,:]>(z[0]+gs.ojar_elevation)), (np.size(p,0),-1))
     outsideOuterHemi.n_outside = gs.n_hydraulic
     outsideOuterHemi.n_inside = gs.n_jar
-    soutsideOuterHemi.surface_type = 'normal'
+    outsideOuterHemi.surface_type = 'normal'
     outsideOuterHemi.absorption = 0
     surface_list.append(outsideOuterHemi)
 
@@ -560,20 +560,21 @@ def createGeometry(gs):
 #        (sum((p - repmat(vp_center,size(p,1),1,size(p,3))).*repmat(vp_axis,size(p,1),1,size(p,3)), 2) > (-vp_flange_thick(1)+vp_nip_top)), ...
 #        size(p,1), [] ));
     pressureVesselNippleWall.inbounds_function = lambda p:np.reshape((np.sum([(p - np.matlib.repmat(vp_center,np.size(p,0),1,np.size(p,2)))*np.matlib.repmat(vp_axis,np.size(p,0),1,np.size(p,2)),2]) <= gs.vp_nip_top) and (np.sum((p - np.matlib.repmat(vp_center,np.size(p,0),1,np.size(p,2)))* np.matlib.repmat(vp_axis,np.size(p,0),1,np.size(p,2)),2) > (-gs.vp_flange_thick[0]+gs.vp_nip_top)), (np.size(p,0),-1))
-    pressureVesselNippleWall.n_outside = n_pressurewall
+    pressureVesselNippleWall.n_outside = gs.n_pressurewall
     pressureVesselNippleWall.n_inside = gs.n_hydraulic
     pressureVesselNippleWall.surface_type = 'normal'
     pressureVesselNippleWall.absorption = 1
     surface_list.append(pressureVesselNippleWall)
-    
+
+    #LOOK AT THIS
     viewportAirSide = surface.surface()
     viewportAirSide.description = 'air side of viewport'
 #    surface_list(end).intersect_function = @(sp,indir)RayToPlane(sp,indir, ...
 #        vp_center, vp_axis);
     viewportAirSide.shape = 'plane'
-    viewportAirSide.param_list = [vp_center, vp_axis]
+    viewportAirSide.param_list = [vp_center, vp_axis] # 3 element ndarray coordinates
 #    surface_list(end).inbounds_function = @(p)(reshape( sum((p - repmat(vp_center,size(p,1),1,size(p,3))).^2,2) <= (vp_air_rad^2), size(p,1), [] ));
-    viewportAirSide.inbounds_function = lambda p:np.reshape(np.sum([(p - np.matlib.repmat(vp_center,np.size(p,0),1,np.size(p,2)))**2,2]) <= (gs.vp_air_rad**2), (np.size(p,0),-1))
+    viewportAirSide.inbounds_function = lambda p:np.reshape(np.sum([(p - np.matlib.repmat(vp_center,np.size(p,0),1,np.size(p,2)))**2,2]) <= (gs.vp_air_rad**2), (np.size(p,0),-1))  # Anon function inputs a list of pts p and outputs for each a t or f depending on if the point is in part of the shape that's real or not; disks in this case | p[:,1] for x axis
     viewportAirSide.n_outside = gs.n_air
     viewportAirSide.n_inside = gs.n_pressurewindow
     viewportAirSide.surface_type = 'normal'
@@ -610,29 +611,6 @@ def createGeometry(gs):
     viewportRetainer.absorption = 1
     surface_list.append(viewportRetainer)
 
-    dummyplane = surface.surface()
-    dummyplane.description = 'xy plane with 10cm radius disc cutout'
-    dummyplane.shape = 'plane'
-    dummyplane.param_list = [np.array([0,0,0]), np.array([0,0,1])] # xy-plane
-    dummyplane.inbounds_function = lambda p:np.reshape((p[:,1,:]*p[:,1,:]+p[:,2,:]*p[:,2,:]) < 100, (np.size(p,0),-1)) # 10cm disc
-    dummyplane.n_outside = gs.n_pressurewall
-    dummyplane.n_inside = gs.n_pressurewindow
-    dummyplane.surface_type = 'normal'
-    dummyplane.absorption = 1
-#    surface_list.append(dummyplane)
-
-    dummycyl = surface.surface()
-    dummycyl.description = '10-cm radius cylinder along z axis from z=0 to z=5'
-    dummycyl.shape = 'cylinder'
-    dummycyl.param_list=[np.array([0,0,0]), np.array([0,0,1]), np.array([10])]
-    dummycyl.inbounds_function = lambda p:np.reshape((p[:,3,:] > 0) * (p[:,3,:] < 5), (np.size(p,0),-1))
-    dummycyl.n_outside = n_pressurewall
-    dummycyl.n_inside = gs.n_hydraulic
-    dummycyl.surface_type = 'normal'
-    dummycyl.absorption = 1
-#    surface_list.append(dummycyl)
-    
-    
     nippleBottom = surface.surface()
     nippleBottom.description = 'nipple bottom'
 #    surface_list(end).intersect_function = @(sp,indir)RayToPlane(sp,indir, ...
@@ -1117,14 +1095,14 @@ def createGeometry(gs):
 ###################
 
     if gs.bubble_present:
-        bubble = surface()
-        bubbe.description = 'bubble'
+        bubble = surface.surface()
+        bubble.description = 'bubble'
         bubble.shape = 'sphere'
         bubble.param_list = [gs.bubble_position, gs.bubble_radius]
 #        surface_list(end).intersect_function = @(sp,indir)RayToSphere(sp,indir, ...
 #            bubble_position, bubble_radius);
 #        surface_list(end).inbounds_function = @(p)(reshape(p(:,3,:)>-500, size(p,1), [] ));
-        bubble.inbounds_function = lambda p:np.reshape(p[:,2,:]>-500, (np.size(p,0),-1))
+        bubble.inbounds_function = lambda p:np.reshape(p[:,2,:]>-500, (np.size(p,0),-1))                ## What is this?
         bubble.n_outside = gs.n_target
         bubble.n_inside = gs.n_air
         bubble.surface_type = 'normal'
@@ -1132,7 +1110,7 @@ def createGeometry(gs):
         surface_list.append(bubble)
 
     # %% create ray lists for Camera
-    [raydirections, pixelmap] = GenerateRaysFromCamera(gs.cam_resolution, cam_pixelpitch, .5*(1+gs.cam_resolution), gs.cam_f, gs.cam_pitch + gs.vp_theta - (np.pi/2), gs.cam_yaw, gs.cam_roll, gs.cam_barreld, gs.cam_lenstype)
+    [raydirections, pixelmap] = GenerateRaysFromCamera.GenerateRaysFromCamera(gs.cam_resolution, cam_pixelpitch, .5*(1+gs.cam_resolution), gs.cam_f, gs.cam_pitch + gs.vp_theta - (np.pi/2), gs.cam_yaw, gs.cam_roll, gs.cam_barreld, gs.cam_lenstype)
 
 #    rays{1} = [raydirections repmat([0 0 1 1 0 0 0],size(raydirections,1),1)];
 #    pixels{1} = pixelmap;
@@ -1167,7 +1145,7 @@ def createGeometry(gs):
         for n in range(1,gs.lights_number+1):
             l_angle=(2*np.pi/gs.lights_number)*n
             
-            y=[0, 1, 0];
+            y=[0, 1, 0]
             # %define an orthonormal basis in which the camera axis is z
             z_prime=c_axis/np.linalg.norm(c_axis) #normalise c_axis (who decided to make norm the function that finds magnitude?)
             y_prime=y-np.dot(y,z_prime)*z_prime #project y onto z plane
@@ -1224,15 +1202,15 @@ def createGeometry(gs):
         # %generate ray directions
         thetas=2*np.pi*np.random.randn(lights_nrays*lights_number,1)
         oneminuscosphis=(1-np.cos(gs.lens_angle/2))*np.random.randn(gs.lights_nrays*gs.lights_number,1) #I am randomising 1-cosphi as opposed to phi as its probability remains uniform and varies 0,2 as phi varies 0,pi
-        phis=arccos(-oneminuscosphis+1) #find phis
-        c_raydirs=np.multiply(np.sin(phis),np.cos(thetas))*x_prime+ np.multiply(sin(phis),sin(thetas))*y_prime + (-oneminuscosphis+1)*z_prime #using some elementwise multiplication
+        phis = np.arccos(-oneminuscosphis+1) #find phis
+        c_raydirs=np.multiply(np.sin(phis),np.cos(thetas))*x_prime+ np.multiply(np.sin(phis),np.sin(thetas))*y_prime + (-oneminuscosphis+1)*z_prime #using some elementwise multiplication
         
         # %place ray directions in the ray array
         c_startindex=gs.lights_nrays*gs.lights_number*(c-1)
         c_endindex=gs.lights_nrays*gs.lights_number*c
 #        rays{2}((c_startindex+1):c_endindex,1:3)=c_raydirs;
         rays[1][(c_startindex):c_endindex,0:3] = c_raydirs
-    end
+
 
     # %randomize polarization properties
 #    rays{2}(:,4:6)=rand(lights_nrays*lights_number*3,3) - rand(lights_nrays*lights_number*3,3);
@@ -1241,6 +1219,7 @@ def createGeometry(gs):
     rays[1][:,3:6]=np.random.randn(gs.lights_nrays*gs.lights_number*3,3) - np.random.randn(gs.lights_nrays*gs.lights_number*3,3)
     rays[1][:,6:10]=np.matlib.repmat([1, 0, 0, 0],gs.lights_nrays*gs.lights_number*3,1)
 #   return %remove this to see a plot of where the lights are
+
 
     # %% Test Scatter Plot of Light Rays
 #    figure(1701);

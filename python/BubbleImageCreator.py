@@ -48,7 +48,7 @@ gs.vp_theta = 22.5*np.pi/180 #%20*pi/180;%21.8*pi/180; %correct/22.509
 gs.vp_focuselev = -6.531
 gs.vp_focuslen = 28.271 # distance from convergence point to CF seal
 
-# Camera Dimentions
+# Camera Dimensions
 gs.vp_win_rad = 1.82372 # mpf is 1.73*.5*2.54; % radius of glass (black on circumference)
 gs.vp_air_rad = 1.5875 # radius of air-side can (black on circumference)
 #doesn't really matter
@@ -59,12 +59,14 @@ gs.vp_flange_rad = 6.985
 gs.vp_win_thick = 0.5080 #measured from location of innersurface
 gs.vp_nip_top = -0.6805 #location of innersurface of the window %measured from z=0 for entire cameracan (surface of flange)
 gs.vp_can_OAL = 17.3101 #length of the camera can
+
 if 1:
 	gs.vp_flange_thick =np.array([7.3025, 1.7526, 1.7272, 1.7272, 1.7272]) #viewport length,bottom half of bottom flange, top half of bottom flange, bottom halp top flange, guess
 	gs.vp_nip_rad = 6.6153 # radius of hydraulic-side nipple (black on circumference) %radius of inner viewport cylinder surface
 else:
 	gs.vp_flange_thick = 2.54*np.array([(2.88-2.382), .69, .625, .625, .625])
 	gs.vp_nip_rad = 2.54 # radius of hydraulic-side nipple (black on circumference)
+
 # retroreflector cone and cylindrical surface
 gs.rd_rad = 12.5 # reflector-diffuser radius
 gs.rd_top = 0 #10
@@ -136,17 +138,18 @@ pixelid = range(n_pixels_1)
 
 found_endpoints = np.zeros(np.size(pixelid),dtype=bool)
 
-final_rays = finalRays()
+final_rays = finalRays.finalRays()  # Check
 final_rays.incoming_ray = np.zeros(n_pixels, 10)
 final_rays.intersection_point = np.zeros(n_pixels, 3)
 final_rays.surface_normal = np.zeros(n_pixels, 3)
 final_rays.ray_index = np.zeros(n_pixels, 1)
 final_rays.surface_index = np.zeros(n_pixels, 1)
 
+## What is this?
 for n in range(np.size(raytracer_output,0,-1)):
     if np.all(found_endpoints):
         break
-    
+
     [pixel_present, pixel_ix] = np.isin(pixelid, raytracer_output[n].ray_index)
     these_endpoints = np.logical_and(not found_endpoints, pixel_present)
 
@@ -189,7 +192,7 @@ n_rays=n_rays[1]
 led_id=range(n_rays)
 found_endpoints = np.zeroes(np.size(led_id),dtype=bool)  #%prepare a row (maybe should be column?) vector boolean array of length N
 
-final_rays2 = finalRays()
+final_rays2 = finalRays.finalRays() #Check
 final_rays2.incoming_ray = np.zeros(n_rays, 10) #... %does each pixel coorespond to one array?
 final_rays2.intersection_point = np.zeros(n_rays, 3)
 final_rays2.surface_normal = np.zeros(n_rays, 3)
@@ -199,9 +202,9 @@ final_rays2.surface_index = np.zeros(n_rays, 1)
 for n in range(np.size(raytracer_output2,0,-1)): #%cycles through different scattering steps
     if np.all(found_endpoints):
         break
-    
+
     # %ray_present is the shape of led_id by virtue of ismember()
-    [ray_present, led_ix] = isin(led_id, raytracer_output2[n].ray_index) # %led_ix are the locations of the rays cooresponding the pixel ids in raytracer_output2(n).ray_index
+    [ray_present, led_ix] = isin(led_id, raytracer_output2[n].ray_index) # %led_ix are the locations of the rays corresponding the pixel ids in raytracer_output2(n).ray_index
     these_endpoints = np.logical_and(not found_endpoints, ray_present)  #%if we have not yet found the point and it was just located then true
 
     found_endpoints = np.logical_or(found_endpoints, these_endpoints) # %points we already found or points we just found

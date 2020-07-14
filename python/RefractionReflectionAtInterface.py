@@ -40,6 +40,9 @@
 # %
 # % 12/15/09, CED
 
+import numpy as np
+import math
+
 def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_handling = -1):
 
     refracted_rays = []
@@ -58,7 +61,7 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     # else:
     #     n1 = n1[:]  #Unnecessary
 
-    if numel(n2)==1:
+    if numel(n2)==1:    # What is 'numel' ?
         n2 = np.matlib.repmat(n2,np.size(incoming_rays,0),1)
     # else:
     #     n2 = n2[:]  #Unnecessary

@@ -35,6 +35,7 @@
 #% 8/18/16, CED
 
 import numpy as np
+import math
 
 #function scattered_rays = RayleighScattering(incoming_rays, azimuth_precision)
 class RayleighScatteringClass(object):
@@ -87,7 +88,7 @@ class RayleighScatteringClass(object):
         scatter_phi = 2*np.pi*scatter_dice[:, 1]
 
         if np.any(linpol_scatter):
-            linpol_angle = .5 * atan2(incoming_rays[linpol_scatter,8], incoming_rays[linpol_scatter,7])
+            linpol_angle = .5 * math.atan2(incoming_rays[linpol_scatter,8], incoming_rays[linpol_scatter,7])
             ix = math.floor(azimuth_precision*scatter_dice[linpol_scatter, 2]) + 1
             ix = np.minimum(ix, azimuth_precision)
             ix_frac = azimuth_precision*scatter_dice[linpol_scatter, 1] - (ix-1)

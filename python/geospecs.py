@@ -2,7 +2,7 @@ import numpy as np
 
 class geospecs(object):
 
-    def __init__(self):
+    def __init__(self): #add deres variable
         #Bubble
         self.bubble_present=False
         self.bubble_radius=1

@@ -50,18 +50,16 @@
 
 class surface(object):
     def __init__(self):
-        #attributes
-        self.description= None
+        # attributes
+        self.description = None
         self.n_outside = None
-        self.n_inside =None
-        self.surface_type=None
-        self.absorption=None
-        #Add these to replace assigning RayTo____() function at runtime
-        self.shape = None #For now they will be strings, later maybe change to integers to represent each type
+        self.n_inside = None
+        self.surface_type = None
+        self.absorption = None
+        # Add these to replace assigning RayTo____() function at runtime
+        self.shape = None  # For now they will be strings, later maybe change to integers to represent each type
         self.param_list = None
-        
-        #No longer have these
-        #self.intersect_function= None
-        #self.inbounds_function=None
+        self.inbounds_function = None
 
-	
+        # No longer have these
+        # self.intersect_function= None
