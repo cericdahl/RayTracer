@@ -304,7 +304,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #            % glancing blows)
 
             print(l_ray.shape)
-            print((np.greater(l_ray, np.transpose(np.matlib.repmat(min_travel_length * np.equal(six_last, n),l_ray.shape[1],1)))).shape)
+            #print((np.greater(l_ray, np.transpose(np.matlib.repmat(min_travel_length * np.equal(six_last, n),l_ray.shape[1],1)))).shape)
 #            valid_intersections = (surfacelist[n].inbounds_function(p_intersect)) and ( np.imag(l_ray)==0 ) and (s_orientation != 0) and (not np.isnan(l_ray)) and (l_ray < np.inf) and (l_ray > np.matlib.repmat(min_travel_length * int(six_last==n),1,np.size(l_ray,1)))
             # test_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1]))))) | old | int(six_last==n) --> int(np.equal(six_last,n)) --> np.equal(six_last,n) | size(l_ray,2) --> l_ray.shape[1], swapped w/ 1, then transposed
             valid_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1])))))
