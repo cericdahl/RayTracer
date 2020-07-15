@@ -13,7 +13,7 @@ def TestGeometry():
     y = 0
     z = 2
 
-    n = 1#000  # number of rays
+    n = 1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x

@@ -33,7 +33,8 @@ def RayToPlane(starting_points, indir, plane_pt, plane_norm):
 
     # Removed repmat for distance_traveled and np.sign(indir * plane_norm), were already nx3; should it be nx3 or nx1?
     intersection_points = starting_points[:,:,np.newaxis] + distance_traveled[:,np.newaxis,:] * indir[:,:,np.newaxis]
-    surface_normals = -plane_norm * np.sign(np.sum(indir * plane_norm))
+    surface_normals = -plane_norm * np.sign(np.sum(indir * plane_norm, axis=1, keepdims=True))
+    surface_normals = surface_normals[:,:,np.newaxis]
     # surface_normals = -np.matlib.repmat(plane_norm, numrays, 1) * np.sign(indir * np.transpose(plane_norm))
     crossing_into = np.round_(-np.sign(np.sum(indir * np.transpose(plane_norm), axis=1, keepdims=True)))
 

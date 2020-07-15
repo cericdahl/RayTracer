@@ -56,12 +56,12 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
         raise Exception('impropper input to RefractionReflactionAtInterface')
         
 
-    if np.suze(n1)==1:
+    if np.size(n1)==1:
         n1 = np.matlib.repmat(n1,np.size(incoming_rays,0),1)
     # else:
     #     n1 = n1[:]  #Unnecessary
 
-    if numel(n2)==1:    # What is 'numel' ?
+    if np.size(n2)==1:
         n2 = np.matlib.repmat(n2,np.size(incoming_rays,0),1)
     # else:
     #     n2 = n2[:]  #Unnecessary
@@ -74,20 +74,21 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
 
 
     # %% normalize inputs
-    goodray_cut = np.sum(incoming_rays[:,0:2]**2,1) > 0
+    goodray_cut = np.sum(incoming_rays[:,0:3]**2,1) > 0
     if np.any(goodray_cut):
-        incoming_rays[goodray_cut,0:2] = incoming_rays[goodray_cut,0:2] / np.matlib.repmat(np.abs(np.sqrt(np.sum(incoming_rays[goodray_cut,0:2]**2,1))),1,3)
+        incoming_rays[goodray_cut,0:3] = incoming_rays[goodray_cut,0:3] / np.swapaxes(np.matlib.repmat(np.abs(np.sqrt(np.sum(incoming_rays[goodray_cut,0:3]**2,1))),3,1), 1, 0) # swapped 3 and 1, changed index [0:2] --> [0:3], swapped axes (3,1000) --> (1000,3)
 
 
     goodsurface_cut = np.sum(surface_normals**2,1) > 0
     if np.any(goodsurface_cut):
-        surface_normals[goodsurface_cut,:] = surface_normals[goodsurface_cut,:] / np.matlib.repmat(np.abs(np.sqrt(np.sum(surface_normals[goodsurface_cut,:]**2,1))),1,3)
+        surface_normals[goodsurface_cut,:] = surface_normals[goodsurface_cut,:] / np.swapaxes(np.matlib.repmat(np.abs(np.sqrt(np.sum(surface_normals[goodsurface_cut,:]**2,1))),3,1), 1, 0)
 
-    incoming_rays[:,3:5] = incoming_rays[:,3:5] - np.matlib.repmat(np.sum(incoming_rays[:,3:5]*incoming_rays[:,0:2],1),1,3) * incoming_rays[:,0:2]
-    goodpolarization_cut = np.sum(incoming_rays[:,3:5]**2,1) > 0
+    incoming_rays[:,3:6] = incoming_rays[:,3:6] - np.swapaxes(np.matlib.repmat(np.sum(incoming_rays[:,3:6]*incoming_rays[:,0:3],1),3,1), 1, 0) * incoming_rays[:,0:3]
+    goodpolarization_cut = np.sum(incoming_rays[:,3:6]**2,1) > 0
     if np.any(goodpolarization_cut):
-        incoming_rays[goodpolarization_cut,3:5] = incoming_rays[goodpolarization_cut,3:5] / np.matlib.repmat(np.abs(np.sqrt(np.sum(incoming_rays[goodpolarization_cut,3:5]**2,1))),1,3)
-
+        incoming_rays[goodpolarization_cut,3:6] = incoming_rays[goodpolarization_cut,3:6] / np.matlib.repmat(np.abs(np.sqrt(np.sum(incoming_rays[goodpolarization_cut,3:6]**2,1))),1,3)
+    #print(incoming_rays[goodpolarization_cut,3:6].shape)
+    #print(np.abs(np.sqrt(np.sum(incoming_rays[goodpolarization_cut,3:6]**2,1))).shape)
     # %% set defaults
     refracted_rays = incoming_rays
     reflected_rays = incoming_rays
@@ -95,29 +96,29 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     reflected_rays[:,6:9] = 0
 
     # %% find interface normals
-    cos_incident_angle = np.sum(-incoming_rays[:,0:2]*surface_normals, 1)
+    cos_incident_angle = np.sum(-incoming_rays[:,0:3]*surface_normals, 1)
     goodhit_cut = cos_incident_angle > 0
 
-    interface_normals = np.cross(-incoming_rays[:,0:2], surface_normals, axis=2)
+    interface_normals = np.cross(-incoming_rays[:,0:3], surface_normals, axis=1)
     sin_incident_angle = np.abs(np.sqrt(np.sum(interface_normals**2, 1)))
     goodinterface_cut = sin_incident_angle > 0
     if np.any(goodinterface_cut):
-        interface_normals[goodinterface_cut,:] = interface_normals[goodinterface_cut,:] / np.matlib.repmat(sin_incident_angle[goodinterface_cut],1,3)
+        interface_normals[goodinterface_cut,:] = interface_normals[goodinterface_cut,:] / np.swapaxes(np.matlib.repmat(sin_incident_angle[goodinterface_cut],3,1), 1, 0)
 
     # %% rotate stokes parameters to new basis
-    c_rot = np.sum(interface_normals * incoming_rays[:,3:5], 1)
-    s_rot = np.sum(np.cross(interface_normals,incoming_rays[:,3:5],axis=2) * incoming_rays[:,0:2], 1)
+    c_rot = np.sum(interface_normals * incoming_rays[:,3:6], 1)
+    s_rot = np.sum(np.cross(interface_normals,incoming_rays[:,3:6],axis=1) * incoming_rays[:,0:3], 1)
     c2_rot = c_rot**2 - s_rot**2
     s2_rot = 2*c_rot*s_rot
     # % for scalar c2_rot and s2_rot, we would write:
     # %     rotmat = [c2_rot s2_rot ; -s2_rot c2_rot];
     # % but the transformation is different for every ray, so.......
     if np.any(goodinterface_cut):
-        incoming_rays[goodinterface_cut,3:5] = interface_normals[goodinterface_cut,:]
+        incoming_rays[goodinterface_cut,3:6] = interface_normals[goodinterface_cut,:]
     # % again, if we had a 2x2 rotmat, we would write:
     # %     incoming_rays(goodinterface_cut,8:9) = incoming_rays(goodinterface_cut,8:9) * rotmat;
     # % but instead we do it one element at a time
-        old_polarization = incoming_rays[goodinterface_cut,7:8]
+        old_polarization = incoming_rays[goodinterface_cut,7:9]
         incoming_rays[goodinterface_cut,7] = old_polarization[:,0]*c2_rot[goodinterface_cut] - old_polarization[:,1]*s2_rot[goodinterface_cut]
         incoming_rays[goodinterface_cut,8] = old_polarization[:,0]*s2_rot[goodinterface_cut] + old_polarization[:,1]*c2_rot[goodinterface_cut]
         refracted_rays[goodinterface_cut,3:9] = incoming_rays[goodinterface_cut,3:9]
@@ -128,7 +129,8 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     # % polarization direction indicated by the stokes parameters, one in the
     # % interface_normal, and one in the interface-plane -- the latter two make
     # % up the unpolarized portion of the incoming ray
-    amplitudes = np.zeros((np.size(incoming_rays,1),3,2))
+    amplitudes = np.zeros((incoming_rays.shape[0],3,2))
+    print(1j*np.arctan2(incoming_rays[:,9],incoming_rays[:,8]))
     polarized_intensity = np.abs(np.sqrt(np.sum(incoming_rays[:,7:9]**2,1)))
     amplitudes[:,0,0] = np.abs(np.sqrt(.5 * (polarized_intensity + incoming_rays[:,7])))
     amplitudes[:,0,1] = np.abs(np.sqrt(.5 * (polarized_intensity - incoming_rays[:,7]))) * np.exp(1j*math.atan2(incoming_rays[:,9],incoming_rays[:,8]))

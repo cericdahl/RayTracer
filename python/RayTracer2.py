@@ -303,7 +303,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #            % this surface (counting only positive, real distances and ignoring
 #            % glancing blows)
 
-            print(l_ray.shape)
+            #print(l_ray.shape)
             #print((np.greater(l_ray, np.transpose(np.matlib.repmat(min_travel_length * np.equal(six_last, n),l_ray.shape[1],1)))).shape)
 #            valid_intersections = (surfacelist[n].inbounds_function(p_intersect)) and ( np.imag(l_ray)==0 ) and (s_orientation != 0) and (not np.isnan(l_ray)) and (l_ray < np.inf) and (l_ray > np.matlib.repmat(min_travel_length * int(six_last==n),1,np.size(l_ray,1)))
             # test_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1]))))) | old | int(six_last==n) --> int(np.equal(six_last,n)) --> np.equal(six_last,n) | size(l_ray,2) --> l_ray.shape[1], swapped w/ 1, then transposed
@@ -393,12 +393,12 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             ray_index = []
             continue #move to next scatter
         
-        l_to_bulkscatter = -rayleigh_next[:,0] * np.log(np.random.randn(np.size(rayleigh_next, 0), 1))
+        l_to_bulkscatter = -rayleigh_next[:,0] * np.log(np.random.rand(rayleigh_next.shape[0]))
 
-        surface_scatter_cut = np.logical_and(scatter_cut, (l_next <= l_to_bulkscatter))
+        surface_scatter_cut = np.logical_and(scatter_cut, (np.less_equal(l_next, l_to_bulkscatter)))
         unified_scatter_cut = np.logical_and(surface_scatter_cut, (surfacetype_next == 2))
-        normal_scatter_cut = np.logical_and(surface_scatter_cut, not unified_scatter_cut)
-        rayleigh_scatter_cut = np.logical_and(scatter_cut, not surface_scatter_cut)
+        normal_scatter_cut = np.logical_and(surface_scatter_cut, ~unified_scatter_cut)
+        rayleigh_scatter_cut = np.logical_and(scatter_cut, ~surface_scatter_cut)
 
 #        %% Now implement rayleigh scatters (scattering bit will happen later)
         smix_next = six_next
@@ -411,7 +411,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         trans_frac = np.exp(-l_next / abslength_next[:,0])
         incoming_intensity = incoming_rays[:,6]
         bulk_abs = incoming_intensity * (1 - trans_frac)
-        incoming_rays[scatter_cut, 6:9] = incoming_rays[scatter_cut, 6:9] * np.matlib.repmat(trans_frac[scatter_cut, 0], 1, 4)
+        incoming_rays[scatter_cut, 6:10] = incoming_rays[scatter_cut, 6:10] * np.matlib.repmat(trans_frac[scatter_cut, np.newaxis], 1, 4)
         
 #        %% now initialize the refracted and reflected ray lists
         refracted_rays = incoming_rays
