@@ -23,6 +23,7 @@ def TestGeometry():
     # rays = initial [forward direction (3), s1 polarization axis (3), s0, s1, s2, s3]
     # Let s0 be 1 and rays be unpolarized (other Stokes parameters = 0 + no polarization axis)
     test_rays = np.zeros((n, 10))
+    test_rays[..., 3] = 1
     test_rays[..., 6] = 1
 
     # Assign initial forward directions in spherical coords for easier isotropism

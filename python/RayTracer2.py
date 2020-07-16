@@ -432,9 +432,10 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             reflected_rays[unified_scatter_cut,:] = UnifiedReflectorModel.UnifiedReflectorModel(incoming_rays[unified_scatter_cut,:], sm_next[unified_scatter_cut,:], n_next[unified_scatter_cut,0], n_next[unified_scatter_cut,1], unifiedsurface_next[unified_scatter_cut,:])
         
 #        % apply the absorption coefficient for all surfaces
+        #print((1 - abs_next[surface_scatter_cut]).shape)
         if np.any(surface_scatter_cut):
-            refracted_rays[surface_scatter_cut,6:9] = refracted_rays[surface_scatter_cut,6:9] * np.matlib.repmat(1-abs_next[surface_scatter_cut],1,4)
-            reflected_rays[surface_scatter_cut,6:9] = reflected_rays[surface_scatter_cut,6:9] * np.matlib.repmat(1-abs_next[surface_scatter_cut],1,4)
+            refracted_rays[surface_scatter_cut,6:10] = refracted_rays[surface_scatter_cut,6:10] * np.matlib.repmat(1-abs_next[surface_scatter_cut],1,4)
+            reflected_rays[surface_scatter_cut,6:10] = reflected_rays[surface_scatter_cut,6:10] * np.matlib.repmat(1-abs_next[surface_scatter_cut],1,4)
         
 #        % and finally do the Rayleigh-scattered rays
         rsc = RayleighScatteringClass.RayleighScatteringClass()
