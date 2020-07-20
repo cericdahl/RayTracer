@@ -80,7 +80,7 @@ def TestGeometry():
     mid.description = 'middle, disk centered on z-axis with radius 10 and z=5'
     mid.shape = 'plane'
     mid.param_list = [np.array([0, 0, 5]), np.array([0, 0, 1])]
-    mid.inbounds_function = lambda p: np.reshape((p[:, 1, :] ** 2 + p[:, 2, :] ** 2 < 100), (np.size(p, 0), -1))
+    mid.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
     mid.n_outside = 2
     mid.n_inside = 1.5
     mid.surface_type = 'normal'
@@ -92,7 +92,7 @@ def TestGeometry():
     bottom.description = 'bottom cap, disk centered on z-axis with radius 10 and z=0'
     bottom.shape = 'plane'
     bottom.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1])]
-    bottom.inbounds_function = lambda p: np.reshape((p[:, 1, :] ** 2 + p[:, 2, :] ** 2 < 100), (np.size(p, 0), -1))
+    bottom.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
     bottom.n_outside = 1.5
     bottom.n_inside = np.inf
     bottom.surface_type = 'normal'
@@ -102,8 +102,21 @@ def TestGeometry():
     return ray_startpoints, test_rays, surface_list
 
 
-[starts, rays, surfaces] = TestGeometry()
+def main():
+    [starts, rays, surfaces] = TestGeometry()
 
-# return of RayTracer2: [ray_interfaces, absorption_table, raytable]
+    """RAYTOCYLINDER BEING CALLED A THIRD TIME AFTER ALL SURFACES -- WHY?"""
+    # return of RayTracer2: [ray_interfaces, absorption_table, raytable]
 
-[ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+
+    print("ray_interfaces:")
+    print(ray_interfaces.shape)
+    print("absorption_table:")
+    print(absorption_table)
+    print("raytable:")
+    print(raytable)
+
+if __name__ == "__main__":
+    main()
+
