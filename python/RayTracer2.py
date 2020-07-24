@@ -188,7 +188,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 
     #instantiate return value containers
     ray_interfaces = []
-#    absorption_table = [] #convert these to numpy arrays after if necessary
     raytable = []
 
     #parse inputs into variable
@@ -213,7 +212,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         max_scatters = max_scat[0]
 
 
-
 #    %% error check inputs
     if np.size(surfacelist) == 0 or np.array(ray_startingpoints).ndim !=2 or np.array(rays).ndim !=2 or np.size(ray_startingpoints,1) !=3 or np.size(rays,1)!=10 or np.size(ray_startingpoints,0)!=np.size(rays,0):
         raise Exception('Improper input to RayTracer2')
@@ -236,7 +234,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
     for i_s in range(np.size(surfacelist)):
         for i_p in range(np.size(bulk_props)):
         
-            #this doesnt needs to be a try statement because python uses short circuiting when evaluating boolean statements
+            #this doesnt need to be a try statement because python uses short circuiting when evaluating boolean statements
             if ((not hasattr(surfacelist, bulk_props[i_p])) or (np.size(getattr(surfacelist[i_s],bulk_props[i_p])) == 0)):
                 setattr(surfacelist[i_s],bulk_props[i_p],np.inf)
 
@@ -252,9 +250,9 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             tir_handling = -1
 
 #    %% initialize raylist
-    p_start = ray_startingpoints
-    incoming_rays = rays
-    ray_index = np.transpose(range(numrays)) #### This may not need to be transposed with numpy
+    p_start = np.copy(ray_startingpoints) # Does this need to be copied?
+    incoming_rays = np.copy(rays)
+    ray_index = np.array(range(numrays))
     smix_last = np.ones(numrays, dtype=int)
     six_last = np.zeros((np.size(p_start,0), 1))
 
@@ -306,16 +304,13 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #            % this surface (counting only positive, real distances and ignoring
 #            % glancing blows)
 
-            #print(l_ray.shape)
-            #print((np.greater(l_ray, np.transpose(np.matlib.repmat(min_travel_length * np.equal(six_last, n),l_ray.shape[1],1)))).shape)
 #            valid_intersections = (surfacelist[n].inbounds_function(p_intersect)) and ( np.imag(l_ray)==0 ) and (s_orientation != 0) and (not np.isnan(l_ray)) and (l_ray < np.inf) and (l_ray > np.matlib.repmat(min_travel_length * int(six_last==n),1,np.size(l_ray,1)))
-            # test_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1]))))) | old | int(six_last==n) --> int(np.equal(six_last,n)) --> np.equal(six_last,n) | size(l_ray,2) --> l_ray.shape[1], swapped w/ 1, then transposed
             valid_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1])))))
 
             l_ray[~valid_intersection] = np.inf
             l_ray, ix = l_ray.min(1), l_ray.argmin(1)
-            #l_ray = np.amin(l_ray, axis=1) #l_ray is an array of minimums
-            #ix = np.argmin(l_ray, axis=1) #ix is the the indexes of the minimums
+            #l_ray is an array of minimums
+            #ix is the the indexes of the minimums
 
 
 #            % find the intersection points, surface normals, and orientations
@@ -334,8 +329,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             s_normal_mech = np.transpose(np.reshape(s_normal_mech[ixcut],(3,-1)))
 
             ixlist = np.matlib.repmat(np.reshape(range(0,s_orientation.shape[1]),(-1,1)), 1, s_orientation.shape[0]) #Check repmat
-            #ixlist = np.matlib.repmat(np.reshape(range(0,np.size(s_orientation,1),(-1,1))),1, np.size(s_orientation,0)) #changed from 1:size(p_intersect,2) to python indexed
-            
             ixcut = (ixlist == np.tile(np.transpose(ix[:]),(np.size(s_orientation,1), 1)))
             s_orientation = np.transpose(s_orientation)
             s_orientation = np.reshape(s_orientation[ixcut],(-1,1))
@@ -393,7 +386,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        %% Now determine which rays get absorbed, rayleigh scattered, or surface scattered
         scatter_cut = np.logical_or((l_next < np.inf), (rayleigh_next[:,0] < np.inf))
         if not np.any(scatter_cut):
-            #RULED OUT
+            # RULED OUT
             ray_index = []
             continue #move to next scatter
         
@@ -417,18 +410,18 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         bulk_abs = incoming_intensity * (1 - trans_frac)
         incoming_rays[scatter_cut, 6:10] = incoming_rays[scatter_cut, 6:10] * np.matlib.repmat(trans_frac[scatter_cut, np.newaxis], 1, 4)
         
-#        %% now initialize the refracted and reflected ray lists
-        refracted_rays = incoming_rays
-        refracted_rays[:, 6:9] = 0
-        reflected_rays = incoming_rays
-        reflected_rays[:, 6:9] = 0
+#        %% now initialize the refracted and reflected ray lists | INCOMING_RAYS IS CHANGED | fixed by copying instead of pointing to
+        refracted_rays = np.copy(incoming_rays)
+        refracted_rays[:, 6:10] = 0
+        reflected_rays = np.copy(incoming_rays)
+        reflected_rays[:, 6:10] = 0
 
 #        %% Now handle the scattering
 #        % First handle normal, diffuse, and retro surfaces
 #        % (all subject to 'normal_scatter_cut')
         if np.any(normal_scatter_cut):
             [refracted_rays[normal_scatter_cut,:], reflected_rays[normal_scatter_cut,:]] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(incoming_rays[normal_scatter_cut,:], s_next[normal_scatter_cut,:], n_next[normal_scatter_cut,0], n_next[normal_scatter_cut,1], tir_handling)
-            
+
             ######## BOOKMARK ##########
         
 #        % Next handle unified reflecting surfaces
@@ -449,6 +442,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        % now cut the raylist in half if singlechild is true --
 #        % decide reflection vs refraction by dice roll, and call it refraction
         if singlechild:
+            #print(reflected_rays[:,6]) | all 0 or nan prior to being set at 0, same with refracted
             total_amp = reflected_rays[:, 6] + refracted_rays[:, 6]
             reflection_roll = np.random.rand(np.size(reflected_rays, 0)) < (reflected_rays[:, 6] / total_amp)
             refracted_rays[reflection_roll, :] = reflected_rays[reflection_roll, :]
@@ -467,6 +461,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             outward_cut = smix_next == -i_s
             infrom_cut = smix_last == -i_s
             outfrom_cut = smix_last == i_s
+
 
             absorption_table[num_scatters, 0, i_s, 0] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, inward_cut)])
             absorption_table[num_scatters, 0, i_s, 1] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, outward_cut)])
@@ -503,7 +498,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             raytable[num_scatters+1, ray_ix, 3:12] = refracted_rays[raytable_cut, :]
 
 #        %% get set for next iteration
-#        % follow reflected and refracted rays that are above the follow_threshold
+#        % follow reflected and refracted rays that are above the follow_threshold | refracted and reflected_rays[:,6] all 0
         refracted_rays_to_follow = np.logical_and(scatter_cut, (refracted_rays[:,6] > follow_threshold[0]))
         reflected_rays_to_follow = np.logical_and(scatter_cut, (reflected_rays[:,6] > follow_threshold[1]))
                 
@@ -526,9 +521,8 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        % identify reflected rays with a negative ray_index (refracted rays
 #        % also inhered the negative index if they have previously been
 #        % reflected)
+        """ray_index is being set to empty here on first iteration -- refracted and reflected rays to follow full False"""
         ray_index = np.array([ray_index[refracted_rays_to_follow], -np.abs(ray_index[reflected_rays_to_follow])])
-        #print(refracted_rays_to_follow)
-        #print(reflected_rays_to_follow)
         
     absorption_table = absorption_table[0:num_scatters, :, :, :]
     

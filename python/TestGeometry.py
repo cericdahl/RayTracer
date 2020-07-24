@@ -8,12 +8,12 @@ import surface
 
 def TestGeometry():
     # First, create ray starting points and isotropic rays
-    # Coordinates of startingpoint -- is the same for all rays
+    # Coordinates of startingpoint -- same for all rays
     x = 0
     y = 0
     z = 2
 
-    n = 1000  # number of rays
+    n = 10  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -30,7 +30,7 @@ def TestGeometry():
     for i in range(n):
         azimuth = random.random() * 2 * math.pi
         a = np.random.uniform(-1, 1)
-        polar = np.arccos(a) # -1 < theta < 1 so random numbers are not biased towards the poles
+        polar = np.arccos(a) # -1 < theta < 1 so random numbers are not biased towards the pole
 
         test_rays[i, 0] = np.sin(polar) * np.cos(azimuth) # x
         test_rays[i, 1] = np.sin(polar) * np.sin(azimuth) # y
@@ -43,7 +43,7 @@ def TestGeometry():
     bot_cyl.description = 'bottom cylinder along z-axis, 10cm radius from z=0 to z=5'
     bot_cyl.shape = 'cylinder'
     bot_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
-    bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (np.size(p, 0), -1)) # Replaced 3 w/ 2
+    bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (np.size(p, 0), -1))
     bot_cyl.n_outside = np.inf
     bot_cyl.n_inside = 1.5
     bot_cyl.surface_type = 'normal'
@@ -67,7 +67,7 @@ def TestGeometry():
     top.description = 'top cap, disk centered on z-axis with radius 10 and z=10'
     top.shape = 'plane'
     top.param_list = [np.array([0, 0, 10]), np.array([0, 0, 1])]
-    top.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2) < 100, (p.shape[0], -1)) # shifted indices down 1 and eliminated 3rd dimension index
+    top.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2) < 100, (p.shape[0], -1))
     # Direction of normal vector considered 'outside'
     top.n_outside = np.inf
     top.n_inside = 2
@@ -77,7 +77,7 @@ def TestGeometry():
 
     # Middle
     mid = surface.surface()
-    mid.description = 'middle, disk centered on z-axis with radius 10 and z=5'
+    mid.description = 'middle disk centered on z-axis with radius 10 and z=5'
     mid.shape = 'plane'
     mid.param_list = [np.array([0, 0, 5]), np.array([0, 0, 1])]
     mid.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
@@ -105,17 +105,17 @@ def TestGeometry():
 def main():
     [starts, rays, surfaces] = TestGeometry()
 
-    """RAYTOCYLINDER BEING CALLED A THIRD TIME AFTER ALL SURFACES -- WHY?"""
-    # return of RayTracer2: [ray_interfaces, absorption_table, raytable]
-
     [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
 
+    """
     print("ray_interfaces:")
     print(ray_interfaces.shape)
     print("absorption_table:")
     print(absorption_table)
+    print(absorption_table.shape)
     print("raytable:")
     print(raytable)
+    """
 
 if __name__ == "__main__":
     main()
