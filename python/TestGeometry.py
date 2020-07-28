@@ -13,7 +13,7 @@ def TestGeometry():
     y = 0
     z = 2
 
-    n = 10  # number of rays
+    n = 1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -107,7 +107,7 @@ def main():
 
     [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
 
-    """
+
     print("ray_interfaces:")
     print(ray_interfaces.shape)
     print("absorption_table:")
@@ -115,7 +115,8 @@ def main():
     print(absorption_table.shape)
     print("raytable:")
     print(raytable)
-    """
+
+
 
 if __name__ == "__main__":
     main()

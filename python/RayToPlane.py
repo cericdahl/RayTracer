@@ -18,10 +18,10 @@ def RayToPlane(starting_points, indir, plane_pt, plane_norm):
 
     # Normalize directions | some of this should probably be done in RayToShape as it is common among all RayToXXX
     goodray_cut = np.sum(indir ** 2, 1) > 0
-    if any(goodray_cut):
-        indir[goodray_cut, :] = indir[goodray_cut, :] / np.transpose(np.matlib.repmat(abs(np.sqrt(np.sum(indir ** 2, 1))), 3, 1))
-    if sum(plane_norm ** 2) > 0:
-        plane_norm = plane_norm / abs(np.sqrt(np.sum(plane_norm**2)))
+    if np.any(goodray_cut):
+        indir[goodray_cut, :] = indir[goodray_cut, :] / np.matlib.repmat(np.abs(np.sqrt(np.sum(indir ** 2, 1)))[:, np.newaxis], 1, 3)
+    if np.sum(plane_norm ** 2) > 0:
+        plane_norm = plane_norm / np.abs(np.sqrt(np.sum(plane_norm**2)))
     else:
         raise Exception('Invalid plane for RayToPlane')
 

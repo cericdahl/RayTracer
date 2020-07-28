@@ -82,10 +82,10 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
 
     # %% normalize directions
     goodray_cut = np.sum(indir**2, 1) > 0
-    if any(goodray_cut):
-        indir[goodray_cut,:] = indir[goodray_cut,:] / np.transpose(np.matlib.repmat(abs(np.sqrt(np.sum(indir**2,1))), 3, 1)) # Using goodray_cut for indexing applies normalization to all good rays | was: ValueError: operands could not be broadcast together with shapes (1000,3) (1,3000)
+    if np.any(goodray_cut):
+        indir[goodray_cut,:] = indir[goodray_cut,:] / np.matlib.repmat(np.abs(np.sqrt(np.sum(indir**2,1)))[:, np.newaxis], 1, 3) # Using goodray_cut for indexing applies normalization to all good rays
     if np.sum(cylinder_axis**2) > 0:
-        cylinder_axis = cylinder_axis / abs(np.sqrt(np.sum(cylinder_axis**2)))
+        cylinder_axis = cylinder_axis / np.abs(np.sqrt(np.sum(cylinder_axis**2)))
     else:
         raise Exception('Invalid cylinder for RayToCylinder')
 
@@ -113,9 +113,9 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     cutIndex = np.logical_or(linear_cut, quad_cut)
     distance_traveled[np.logical_not(cutIndex)] = np.nan
 
-    if any(linear_cut): #Might have to switch dimensions linear_cut and :
+    if np.any(linear_cut): #Might have to switch dimensions linear_cut and :
         distance_traveled[linear_cut,:] = np.matlib.repmat(-c[linear_cut] / b[linear_cut], 2, 1) # Swapped 2 and 1
-    if any(quad_cut):
+    if np.any(quad_cut):
         distance_traveled[quad_cut,:] = np.add(np.transpose(np.matlib.repmat(-.5 * b[quad_cut] / a[quad_cut], 2, 1)), (.5 * np.sqrt(b[quad_cut]**2 - 4 * a[quad_cut] * c[quad_cut]) / a[quad_cut])[:, np.newaxis] * np.array([1, -1])) # Added [:, np.newaxis], swapped 2 and 1 in first term, transposed first term, and used np.add instead of +
 
 
