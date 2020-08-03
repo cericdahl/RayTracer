@@ -24,16 +24,18 @@ def RayToSphere(starting_points, indir, sphere_center, sphere_radius):
     crossing_into = []
 
     # check inputs
-    if len(sys.argv) or len(sphere_center) != 3 or len(sphere_radius) != 3 or starting_points.shape[1] != 3 or \
+    if len(sys.argv) != 4 or len(sphere_center) != 3 or len(sphere_radius) != 3 or starting_points.shape[1] != 3 or \
             indir.shape[1] != 3 or starting_points.shape[0] != indir.shape[0]:
         raise Exception('Improper input to RayToSphere')
     sphere_center = np.transpose(sphere_center)
     numrays = starting_points.shape[0]
 
+    """
     # normalize directions
     goodray_cut = np.sum(indir ** 2, 1) > 0
     if np.any(goodray_cut):
         indir[goodray_cut, :] = indir[goodray_cut, :] / np.matlib.repmat(np.abs(np.sqrt(np.sum(indir ** 2, 1)))[:, np.newaxis], 1, 3)
+    """
 
     # solve quadratic for distance traveled
     a = np.sum(indir ** 2, 1)
@@ -50,10 +52,9 @@ def RayToSphere(starting_points, indir, sphere_center, sphere_radius):
     # crossing_into = round(-sign(sum(repmat(incoming_directions,[1,1,2]) .* surface_normals,2)));
     # surface_normals = surface_normals .* repmat(crossing_into,[1 3 1]);
     # crossing_into = reshape(crossing_into,[],2);
-    surface_normals = np.zeros(np.shape(intersection_points)) # necessary?
-    surface_normals = (intersection_points - np.tile(sphere_center[:, np.newaxis], (numrays, 1, 2))) / sphere_radius
-    crossing_into = np.round_(-np.sign(np.sum(np.tile(indir, (1, 1, 2)) * surface_normals, 2)))
-    surface_normals = surface_normals * np.tile(crossing_into, (1, 3, 1))
+    surface_normals = (intersection_points - np.tile(sphere_center[:, np.newaxis], (numrays, 1, 2))) / sphere_radius # np.tile or [:, :, np.newaxis]?
+    crossing_into = np.round_(-np.sign(np.sum(indir[:, :, np.newaxis] * surface_normals, axis=1, keepdims=True)))
+    surface_normals = surface_normals * crossing_into[:, np.newaxis, :]
     crossing_into = np.reshape(crossing_into, (-1, 2))
 
     return [intersection_points, surface_normals, distance_traveled, crossing_into]

@@ -386,7 +386,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        %% Now determine which rays get absorbed, rayleigh scattered, or surface scattered
         scatter_cut = np.logical_or((l_next < np.inf), (rayleigh_next[:,0] < np.inf))
         if not np.any(scatter_cut):
-            # RULED OUT
             ray_index = []
             continue #move to next scatter
         
@@ -421,7 +420,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        % (all subject to 'normal_scatter_cut')
         if np.any(normal_scatter_cut):
             [refracted_rays[normal_scatter_cut,:], reflected_rays[normal_scatter_cut,:]] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(incoming_rays[normal_scatter_cut,:], s_next[normal_scatter_cut,:], n_next[normal_scatter_cut,0], n_next[normal_scatter_cut,1], tir_handling)
-
             ######## BOOKMARK ##########
         
 #        % Next handle unified reflecting surfaces

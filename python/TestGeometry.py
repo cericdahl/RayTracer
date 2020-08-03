@@ -117,7 +117,6 @@ def main():
     print(raytable)
 
 
-
 if __name__ == "__main__":
     main()
 

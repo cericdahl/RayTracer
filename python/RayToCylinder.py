@@ -60,30 +60,17 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
 
     # %% check inputs                                        |  Check this       |
     if len(cyl_center) != 3 or len(cyl_axis) != 3 or cylinder_radius == 0 or starting_points.shape[1] != 3 or np.size(indir,1) != 3 or starting_points.shape[0] != indir.shape[0]:
-        """
-        print(cyl_center)
-        print(len(cyl_center) != 3)
-        print(cyl_axis)
-        print(len(cyl_axis) != 3)
-        print(cylinder_radius)
-        print(cylinder_radius == 0)
-        print(starting_points.shape[1])
-            print(starting_points.shape[1] != 3)
-        print(np.size(indir,1))
-            print(np.size(indir,1) != 3)
-        print(starting_points.shape[0])
-        print(indir.shape[0])
-        print(starting_points.shape[0] != indir.shape[0])
-        """
         raise Exception('Improper input to RayToCylinder')
     cylinder_center = np.transpose(cyl_center) # 1x3 --> 3x1 (3,)
     cylinder_axis = np.transpose(cyl_axis)
     numrays = starting_points.shape[0] # numrays = n
 
+    """
     # %% normalize directions
     goodray_cut = np.sum(indir**2, 1) > 0
     if np.any(goodray_cut):
         indir[goodray_cut,:] = indir[goodray_cut,:] / np.matlib.repmat(np.abs(np.sqrt(np.sum(indir**2,1)))[:, np.newaxis], 1, 3) # Using goodray_cut for indexing applies normalization to all good rays
+    """
     if np.sum(cylinder_axis**2) > 0:
         cylinder_axis = cylinder_axis / np.abs(np.sqrt(np.sum(cylinder_axis**2)))
     else:
@@ -135,7 +122,7 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     #Not sure what the [] is at the end of repmat
     # crossing_into = round(sign(sum(repmat(incoming_directions,[1,1,2]) .* surface_normals,2)));
     # surface_normals = -surface_normals .* repmat(crossing_into,[1 3 1]);
-    crossing_into = np.round_(np.sign(np.sum(indir[:,:,np.newaxis] * surface_normals,axis=1)))
+    crossing_into = np.round_(np.sign(np.sum(indir[:,:,np.newaxis] * surface_normals, axis=1, keepdims=True)))
     surface_normals = -surface_normals * crossing_into[:,np.newaxis,:]
 
     crossing_into = np.reshape(crossing_into,(-1,2))

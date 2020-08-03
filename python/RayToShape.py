@@ -1,9 +1,17 @@
 #Called by IntersectFunction (defined in IntersectFunction.py) with the proper inputs
 import RayToCylinder
 import RayToPlane
+import numpy as np
 # Will have to import other geometries after writing them
 
 def RayToShape(shape, sp, indir, param_list):
+
+    # normalize directions
+    goodray_cut = np.sum(indir ** 2, 1) > 0
+    if np.any(goodray_cut):
+        indir[goodray_cut, :] = indir[goodray_cut, :] / np.matlib.repmat(
+            np.abs(np.sqrt(np.sum(indir ** 2, 1)))[:, np.newaxis], 1, 3)
+
     #maybe turn each of these into try-except statements, in case the specified
     # param_list isn't the right size of elements
     if shape == "cylinder":
