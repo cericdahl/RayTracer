@@ -109,7 +109,7 @@ def RayToQuadsurface(starting_points, indir, q, p, r):
     # crossing_into = round(-sign(sum(repmat(incoming_directions,[1,1,2]) .* surface_normals,2)));
     # surface_normals = surface_normals .* repmat(crossing_into,[1 3 1]);
     # crossing_into = reshape(crossing_into,[],2);
-    crossing_into = np.round_(np.sign(np.sum(indir[:, :, np.newaxis] * surface_normals, axis=1, keepdims=True)))
+    crossing_into = np.round_(np.sign(np.sum(indir[:, :, np.newaxis] * surface_normals, axis=1)))
     surface_normals = surface_normals * crossing_into[:, np.newaxis, :]
     crossing_into = np.reshape(crossing_into, (-1, 2))
 
