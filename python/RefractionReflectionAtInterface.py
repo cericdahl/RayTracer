@@ -129,7 +129,7 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     # % polarization direction indicated by the stokes parameters, one in the
     # % interface_normal, and one in the interface-plane -- the latter two make
     # % up the unpolarized portion of the incoming ray
-    amplitudes = np.zeros((incoming_rays.shape[0],3,2))
+    amplitudes = np.zeros((incoming_rays.shape[0],3,2), dtype=complex)
     polarized_intensity = np.abs(np.sqrt(np.sum(incoming_rays[:,7:9]**2,1)))
     amplitudes[:,0,0] = np.abs(np.sqrt(.5 * (polarized_intensity + incoming_rays[:,7])))
     amplitudes[:,0,1] = np.abs(np.sqrt(.5 * (polarized_intensity - incoming_rays[:,7]))) * np.exp(1j*np.arctan2(incoming_rays[:,9],incoming_rays[:,8]))

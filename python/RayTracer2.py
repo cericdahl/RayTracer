@@ -421,7 +421,9 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if np.any(normal_scatter_cut):
             [refracted_rays[normal_scatter_cut,:], reflected_rays[normal_scatter_cut,:]] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(incoming_rays[normal_scatter_cut,:], s_next[normal_scatter_cut,:], n_next[normal_scatter_cut,0], n_next[normal_scatter_cut,1], tir_handling)
             ######## BOOKMARK ##########
-        
+        print(refracted_rays[normal_scatter_cut,6])
+        print(reflected_rays[normal_scatter_cut,6])
+
 #        % Next handle unified reflecting surfaces
         if np.any(unified_scatter_cut):
             reflected_rays[unified_scatter_cut,:] = UnifiedReflectorModel.UnifiedReflectorModel(incoming_rays[unified_scatter_cut,:], sm_next[unified_scatter_cut,:], n_next[unified_scatter_cut,0], n_next[unified_scatter_cut,1], unifiedsurface_next[unified_scatter_cut,:])
