@@ -107,7 +107,7 @@ def main():
 
     [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
 
-
+    """
     print("ray_interfaces:")
     print(ray_interfaces.shape)
     print("absorption_table:")
@@ -115,6 +115,7 @@ def main():
     print(absorption_table.shape)
     print("raytable:")
     print(raytable)
+    """
 
 
 if __name__ == "__main__":

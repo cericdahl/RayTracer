@@ -183,7 +183,7 @@ import IntersectFunction
 
 # noinspection PyRedundantParentheses
 def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_travel_len = np.spacing(np.float64(1)), follow_thresh = np.array([0, 0], dtype=np.float64), tir_handling = [], full_output = True, singlechild = True, output_raytable = False):
-    #ignore divide by zero / nan errors
+    #ignore divide by zero / nan warnings
     np.seterr(divide='ignore', invalid='ignore')
 
     #instantiate return value containers
@@ -258,7 +258,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 
 #    %%  follow rays
     num_scatters = 0
-    while (not(ray_index.size == 0)):
+    while (len(ray_index) != 0):
 
         if num_scatters >= max_scatters:
             break
@@ -298,14 +298,14 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
                 int_surfacetype = 2
                 
             if (surfacelist[n].surface_type == 'retro'): #% reflect incoming ray back where it came from
-                s_normal = np.tile(-1 * np.array(incoming_rays[:,0:2]), (1, 1, np.size(p_intersect,2)))
+                s_normal = np.tile(-1 * np.array(incoming_rays[:,0:3]), (1, 1, np.size(p_intersect,2)))
             
 #            % find the closest intersection point in the inbounds portion of
 #            % this surface (counting only positive, real distances and ignoring
 #            % glancing blows)
 
 #            valid_intersections = (surfacelist[n].inbounds_function(p_intersect)) and ( np.imag(l_ray)==0 ) and (s_orientation != 0) and (not np.isnan(l_ray)) and (l_ray < np.inf) and (l_ray > np.matlib.repmat(min_travel_length * int(six_last==n),1,np.size(l_ray,1)))
-            valid_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat(min_travel_length * np.equal(six_last, n),1,l_ray.shape[1])))))
+            valid_intersection = np.logical_and.reduce(((surfacelist[n].inbounds_function(p_intersect)),(np.equal(np.imag(l_ray), 0)),(np.not_equal(s_orientation, 0)),(~np.isnan(l_ray)),(np.less(l_ray, np.full(l_ray.shape, np.inf))),(np.greater(l_ray, np.matlib.repmat((min_travel_length * np.equal(six_last, n)),1,l_ray.shape[1])))))
 
             l_ray[~valid_intersection] = np.inf
             l_ray, ix = l_ray.min(1), l_ray.argmin(1)
@@ -333,14 +333,14 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             s_orientation = np.transpose(s_orientation)
             s_orientation = np.reshape(s_orientation[ixcut],(-1,1))
 
-            n_before_after = np.matlib.repmat([surfacelist[n].n_outside, surfacelist[n].n_inside],np.size(s_orientation),1)
-            n_before_after[np.where(s_orientation<0),:] = np.matlib.repmat([surfacelist[n].n_inside, surfacelist[n].n_outside],np.sum((s_orientation.astype(int)<0)),1) #cast bool array to int
+            n_before_after = np.matlib.repmat([surfacelist[n].n_outside, surfacelist[n].n_inside],len(s_orientation),1)
+            n_before_after[(s_orientation<0).flatten(),:] = np.matlib.repmat([surfacelist[n].n_inside, surfacelist[n].n_outside],np.sum((s_orientation<0)),1) #cast bool array to int
 
             abs_before_after = np.matlib.repmat([surfacelist[n].abslength_outside, surfacelist[n].abslength_inside],np.size(s_orientation),1)
-            abs_before_after[np.where(s_orientation<0),:] = np.matlib.repmat([surfacelist[n].abslength_inside, surfacelist[n].abslength_outside],np.sum((s_orientation.astype(int)<0)),1)
+            abs_before_after[(s_orientation<0).flatten(),:] = np.matlib.repmat([surfacelist[n].abslength_inside, surfacelist[n].abslength_outside],np.sum((s_orientation<0)),1)
 
             scat_before_after = np.matlib.repmat([surfacelist[n].rayleigh_outside, surfacelist[n].rayleigh_inside],np.size(s_orientation),1)
-            scat_before_after[np.where(s_orientation<0),:] = np.matlib.repmat([surfacelist[n].rayleigh_inside, surfacelist[n].rayleigh_outside],np.sum((s_orientation.astype(int)<0)),1)
+            scat_before_after[(s_orientation<0).flatten(),:] = np.matlib.repmat([surfacelist[n].rayleigh_inside, surfacelist[n].rayleigh_outside],np.sum((s_orientation<0)),1)
             
 #            % if this is the closest scatter so far, update the scatter
 #            % property variables
@@ -379,7 +379,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 
             outdir = s_next[diffuse_cut,:]*np.matlib.repmat(cos_theta,1,3) + x_tmp*np.matlib.repmat(sin_theta * np.cos(phi),1,3) + y_tmp*np.matlib.repmat(sin_theta * np.sin(phi),1,3)
 
-            s_normal_tmp = outdir - incoming_rays[diffuse_cut,0:2]
+            s_normal_tmp = outdir - incoming_rays[diffuse_cut,0:3]
             s_next[diffuse_cut,:] = s_normal_tmp / np.matlib.repmat(np.abs(np.sqrt(np.sum(s_normal_tmp**2, 1))), 1, 3)
             
 
@@ -401,7 +401,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if np.any(rayleigh_scatter_cut):
             six_next[rayleigh_scatter_cut] = 0
             l_next[rayleigh_scatter_cut] = l_to_bulkscatter[rayleigh_scatter_cut]
-            p_next[rayleigh_scatter_cut, :] = p_start[rayleigh_scatter_cut, :] + np.matlib.repmat(l_to_bulkscatter[rayleigh_scatter_cut], 1, 3) * incoming_rays[rayleigh_scatter_cut, 0:2]
+            p_next[rayleigh_scatter_cut, :] = p_start[rayleigh_scatter_cut, :] + np.matlib.repmat(l_to_bulkscatter[rayleigh_scatter_cut], 1, 3) * incoming_rays[rayleigh_scatter_cut, 0:3]
         
 #        %% Now apply bulk absorption
         trans_frac = np.exp(-l_next / abslength_next[:,0])
@@ -421,15 +421,12 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if np.any(normal_scatter_cut):
             [refracted_rays[normal_scatter_cut,:], reflected_rays[normal_scatter_cut,:]] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(incoming_rays[normal_scatter_cut,:], s_next[normal_scatter_cut,:], n_next[normal_scatter_cut,0], n_next[normal_scatter_cut,1], tir_handling)
             ######## BOOKMARK ##########
-        print(refracted_rays[normal_scatter_cut,6])
-        print(reflected_rays[normal_scatter_cut,6])
 
 #        % Next handle unified reflecting surfaces
         if np.any(unified_scatter_cut):
             reflected_rays[unified_scatter_cut,:] = UnifiedReflectorModel.UnifiedReflectorModel(incoming_rays[unified_scatter_cut,:], sm_next[unified_scatter_cut,:], n_next[unified_scatter_cut,0], n_next[unified_scatter_cut,1], unifiedsurface_next[unified_scatter_cut,:])
         
 #        % apply the absorption coefficient for all surfaces
-        #print((1 - abs_next[surface_scatter_cut]).shape)
         if np.any(surface_scatter_cut):
             refracted_rays[surface_scatter_cut,6:10] = refracted_rays[surface_scatter_cut,6:10] * np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)
             reflected_rays[surface_scatter_cut,6:10] = reflected_rays[surface_scatter_cut,6:10] * np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)
@@ -442,7 +439,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        % now cut the raylist in half if singlechild is true --
 #        % decide reflection vs refraction by dice roll, and call it refraction
         if singlechild:
-            #print(reflected_rays[:,6]) | all 0 or nan prior to being set at 0, same with refracted
             total_amp = reflected_rays[:, 6] + refracted_rays[:, 6]
             reflection_roll = np.random.rand(np.size(reflected_rays, 0)) < (reflected_rays[:, 6] / total_amp)
             refracted_rays[reflection_roll, :] = reflected_rays[reflection_roll, :]
@@ -463,35 +459,35 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             outfrom_cut = smix_last == i_s
 
 
-            absorption_table[num_scatters, 0, i_s, 0] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, inward_cut)])
-            absorption_table[num_scatters, 0, i_s, 1] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, outward_cut)])
-            absorption_table[num_scatters, 1, i_s, 0] = np.sum(bulk_abs[np.logical_and(scatter_cut, inward_cut)])
-            absorption_table[num_scatters, 1, i_s, 1] = np.sum(bulk_abs[np.logical_and(scatter_cut, outward_cut)])
-            absorption_table[num_scatters, 2, i_s, 0] = np.sum(incoming_intensity[np.logical_and(~scatter_cut, outfrom_cut)])
-            absorption_table[num_scatters, 2, i_s, 1] = np.sum(incoming_intensity[np.logical_and(~scatter_cut, infrom_cut)])
+            absorption_table[num_scatters-1, 0, i_s, 0] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, inward_cut)])
+            absorption_table[num_scatters-1, 0, i_s, 1] = np.sum(surface_abs[np.logical_and(surface_scatter_cut, outward_cut)])
+            absorption_table[num_scatters-1, 1, i_s, 0] = np.sum(bulk_abs[np.logical_and(scatter_cut, inward_cut)])
+            absorption_table[num_scatters-1, 1, i_s, 1] = np.sum(bulk_abs[np.logical_and(scatter_cut, outward_cut)])
+            absorption_table[num_scatters-1, 2, i_s, 0] = np.sum(incoming_intensity[np.logical_and(~scatter_cut, outfrom_cut)])
+            absorption_table[num_scatters-1, 2, i_s, 1] = np.sum(incoming_intensity[np.logical_and(~scatter_cut, infrom_cut)])
             
 #        %% store output
         if full_output:
 #            % we round the indices because the sign command used to find
 #            % orientation sometimes gives non-integer surface indices
             curr_ray_interface = np.array([rayInterfaces.rayInterfaces() for i in range(rays.shape[0])])
-            curr_ray_interface[num_scatters].incoming_ray = incoming_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters].refracted_ray = refracted_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters].reflected_ray = reflected_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters].intersection_point = p_next[scatter_cut,:]
-            curr_ray_interface[num_scatters].surface_normal = sm_next[scatter_cut,:]
-            curr_ray_interface[num_scatters].ray_index = np.round_(ray_index[scatter_cut])
-            curr_ray_interface[num_scatters].surface_index = np.round_(six_next[scatter_cut])
-            curr_ray_interface[num_scatters].distance_traveled = l_next[scatter_cut]
-            curr_ray_interface[num_scatters].n_incident = n_next[scatter_cut,0]
-            curr_ray_interface[num_scatters].n_transmitted = n_next[scatter_cut,1]
-            curr_ray_interface[num_scatters].bulkabs_incident = abslength_next[scatter_cut,0]
-            curr_ray_interface[num_scatters].bulkabs_transmitted = abslength_next[scatter_cut,1]
-            curr_ray_interface[num_scatters].rayleigh_incident = rayleigh_next[scatter_cut,0]
-            curr_ray_interface[num_scatters].rayleigh_transmitted = rayleigh_next[scatter_cut,1]
+            curr_ray_interface[num_scatters-1].incoming_ray = incoming_rays[scatter_cut,:]
+            curr_ray_interface[num_scatters-1].refracted_ray = refracted_rays[scatter_cut,:]
+            curr_ray_interface[num_scatters-1].reflected_ray = reflected_rays[scatter_cut,:]
+            curr_ray_interface[num_scatters-1].intersection_point = p_next[scatter_cut,:]
+            curr_ray_interface[num_scatters-1].surface_normal = sm_next[scatter_cut,:]
+            curr_ray_interface[num_scatters-1].ray_index = np.round_(ray_index[scatter_cut])
+            curr_ray_interface[num_scatters-1].surface_index = np.round_(six_next[scatter_cut])
+            curr_ray_interface[num_scatters-1].distance_traveled = l_next[scatter_cut]
+            curr_ray_interface[num_scatters-1].n_incident = n_next[scatter_cut,0]
+            curr_ray_interface[num_scatters-1].n_transmitted = n_next[scatter_cut,1]
+            curr_ray_interface[num_scatters-1].bulkabs_incident = abslength_next[scatter_cut,0]
+            curr_ray_interface[num_scatters-1].bulkabs_transmitted = abslength_next[scatter_cut,1]
+            curr_ray_interface[num_scatters-1].rayleigh_incident = rayleigh_next[scatter_cut,0]
+            curr_ray_interface[num_scatters-1].rayleigh_transmitted = rayleigh_next[scatter_cut,1]
             ray_interfaces.append(curr_ray_interface)
         
-        if output_raytable:
+        if output_raytable: # check num_scatters indexing
             raytable_cut = np.logical_and(scatter_cut, (ray_index > 0))
             ray_ix = round(ray_index[raytable_cut])
             raytable[num_scatters+1, ray_ix, 0:2] = p_next[raytable_cut, :]
@@ -506,23 +502,22 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             inward_cut = smix_next == i_s
             outward_cut = smix_next == -i_s
 
-            absorption_table[num_scatters, 3, i_s, 0] = np.sum(refracted_rays[np.logical_and.reduce((~refracted_rays_to_follow, scatter_cut, inward_cut)), 6]) + np.sum(reflected_rays[np.logical_and.reduce((~reflected_rays_to_follow, scatter_cut, inward_cut)), 6])
-            absorption_table[num_scatters, 3, i_s, 1] = np.sum(refracted_rays[np.logical_and.reduce((~refracted_rays_to_follow, scatter_cut, outward_cut)), 6]) + np.sum(reflected_rays[np.logical_and.reduce((~reflected_rays_to_follow, scatter_cut, outward_cut)), 6])
-            absorption_table[num_scatters, 4, i_s, 0] = np.sum(refracted_rays[np.logical_and(refracted_rays_to_follow, inward_cut), 6]) + np.sum(reflected_rays[np.logical_and(reflected_rays_to_follow, inward_cut), 6])
-            absorption_table[num_scatters, 4, i_s, 1] = np.sum(refracted_rays[np.logical_and(refracted_rays_to_follow, outward_cut), 6]) + np.sum(reflected_rays[np.logical_and(reflected_rays_to_follow, outward_cut), 6])
+            absorption_table[num_scatters-1, 3, i_s, 0] = np.sum(refracted_rays[np.logical_and.reduce((~refracted_rays_to_follow, scatter_cut, inward_cut)), 6]) + np.sum(reflected_rays[np.logical_and.reduce((~reflected_rays_to_follow, scatter_cut, inward_cut)), 6])
+            absorption_table[num_scatters-1, 3, i_s, 1] = np.sum(refracted_rays[np.logical_and.reduce((~refracted_rays_to_follow, scatter_cut, outward_cut)), 6]) + np.sum(reflected_rays[np.logical_and.reduce((~reflected_rays_to_follow, scatter_cut, outward_cut)), 6])
+            absorption_table[num_scatters-1, 4, i_s, 0] = np.sum(refracted_rays[np.logical_and(refracted_rays_to_follow, inward_cut), 6]) + np.sum(reflected_rays[np.logical_and(reflected_rays_to_follow, inward_cut), 6])
+            absorption_table[num_scatters-1, 4, i_s, 1] = np.sum(refracted_rays[np.logical_and(refracted_rays_to_follow, outward_cut), 6]) + np.sum(reflected_rays[np.logical_and(reflected_rays_to_follow, outward_cut), 6])
 
-        #turn the following into nparrays to preserve 2-d shape from matlab code
-        p_start = np.array([p_next[refracted_rays_to_follow,:], p_next[reflected_rays_to_follow,:]])
-        incoming_rays = np.array([refracted_rays[refracted_rays_to_follow,:], reflected_rays[reflected_rays_to_follow,:]])
+        #turn the following into nparrays to preserve 2-d shape from matlab code | must concatenate w/ numpy
+        p_start = np.array(np.concatenate([p_next[refracted_rays_to_follow,:], p_next[reflected_rays_to_follow,:]]))
+        incoming_rays = np.array(np.concatenate([refracted_rays[refracted_rays_to_follow,:], reflected_rays[reflected_rays_to_follow,:]])) # NO REFLECTED RAYS TO FOLLOW, STILL HAVE SOME NANs
 #        % smix_last identifies the volume the ray is traversing next, only used
 #        % for rays that escape the geometry in the next step
-        smix_last = np.array([-smix_next[refracted_rays_to_follow], smix_next[reflected_rays_to_follow]])                                            # |                        |          |                        |
-        six_last = np.abs(np.array([six_next[refracted_rays_to_follow], six_next[reflected_rays_to_follow]]))   #Changed from np.abs(np.array([six_next(refracted_rays_to_follow), six_next(reflected_rays_to_follow)]))    ; note parantheses
+        smix_last = np.array(np.concatenate([-smix_next[refracted_rays_to_follow], smix_next[reflected_rays_to_follow]]))                                            # |                        |          |                        |
+        six_last = np.abs(np.array(np.concatenate([six_next[refracted_rays_to_follow], six_next[reflected_rays_to_follow]])))[:,np.newaxis]   #Changed from np.abs(np.array([six_next(refracted_rays_to_follow), six_next(reflected_rays_to_follow)]))    ; note parantheses
 #        % identify reflected rays with a negative ray_index (refracted rays
 #        % also inhered the negative index if they have previously been
 #        % reflected)
-        """ray_index is being set to empty here on first iteration -- refracted and reflected rays to follow full False"""
-        ray_index = np.array([ray_index[refracted_rays_to_follow], -np.abs(ray_index[reflected_rays_to_follow])])
+        ray_index = np.array(np.concatenate([ray_index[refracted_rays_to_follow], -np.abs(ray_index[reflected_rays_to_follow])]))
         
     absorption_table = absorption_table[0:num_scatters, :, :, :]
     
