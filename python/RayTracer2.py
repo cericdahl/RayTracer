@@ -470,22 +470,23 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if full_output:
 #            % we round the indices because the sign command used to find
 #            % orientation sometimes gives non-integer surface indices
-            curr_ray_interface = np.array([rayInterfaces.rayInterfaces() for i in range(rays.shape[0])])
-            curr_ray_interface[num_scatters-1].incoming_ray = incoming_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters-1].refracted_ray = refracted_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters-1].reflected_ray = reflected_rays[scatter_cut,:]
-            curr_ray_interface[num_scatters-1].intersection_point = p_next[scatter_cut,:]
-            curr_ray_interface[num_scatters-1].surface_normal = sm_next[scatter_cut,:]
-            curr_ray_interface[num_scatters-1].ray_index = np.round_(ray_index[scatter_cut])
-            curr_ray_interface[num_scatters-1].surface_index = np.round_(six_next[scatter_cut])
-            curr_ray_interface[num_scatters-1].distance_traveled = l_next[scatter_cut]
-            curr_ray_interface[num_scatters-1].n_incident = n_next[scatter_cut,0]
-            curr_ray_interface[num_scatters-1].n_transmitted = n_next[scatter_cut,1]
-            curr_ray_interface[num_scatters-1].bulkabs_incident = abslength_next[scatter_cut,0]
-            curr_ray_interface[num_scatters-1].bulkabs_transmitted = abslength_next[scatter_cut,1]
-            curr_ray_interface[num_scatters-1].rayleigh_incident = rayleigh_next[scatter_cut,0]
-            curr_ray_interface[num_scatters-1].rayleigh_transmitted = rayleigh_next[scatter_cut,1]
+            curr_ray_interface = rayInterfaces.rayInterfaces()
+            curr_ray_interface.incoming_ray = incoming_rays[scatter_cut, :]
+            curr_ray_interface.refracted_ray = refracted_rays[scatter_cut, :]
+            curr_ray_interface.reflected_ray = reflected_rays[scatter_cut, :]
+            curr_ray_interface.intersection_point = p_next[scatter_cut, :]
+            curr_ray_interface.surface_normal = sm_next[scatter_cut, :]
+            curr_ray_interface.ray_index = np.round_(ray_index[scatter_cut])
+            curr_ray_interface.surface_index = np.round_(six_next[scatter_cut])
+            curr_ray_interface.distance_traveled = l_next[scatter_cut]
+            curr_ray_interface.n_incident = n_next[scatter_cut, 0]
+            curr_ray_interface.n_transmitted = n_next[scatter_cut, 1]
+            curr_ray_interface.bulkabs_incident = abslength_next[scatter_cut, 0]
+            curr_ray_interface.bulkabs_transmitted = abslength_next[scatter_cut, 1]
+            curr_ray_interface.rayleigh_incident = rayleigh_next[scatter_cut, 0]
+            curr_ray_interface.rayleigh_transmitted = rayleigh_next[scatter_cut, 1]
             ray_interfaces.append(curr_ray_interface)
+
         
         if output_raytable: # check num_scatters indexing
             raytable_cut = np.logical_and(scatter_cut, (ray_index > 0))

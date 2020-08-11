@@ -4,6 +4,7 @@ import math
 import random
 import RayTracer2
 import surface
+import matplotlib.pyplot as plt
 
 
 def TestGeometry():
@@ -13,7 +14,7 @@ def TestGeometry():
     y = 0
     z = 2
 
-    n = 1000  # number of rays
+    n = 3#1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -116,6 +117,30 @@ def main():
     print("raytable:")
     print(raytable)
     """
+
+
+    for i in range(len(ray_interfaces)):
+        print("Scatter # " + str(i+1) + ", # of rays " + str(len(ray_interfaces[i].intersection_point)))
+        print("# of times each surface is hit:")
+        print("Bot Cyl: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 0)))
+        print("Top Cyl: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 1) + np.count_nonzero(ray_interfaces[i].surface_index == (-1))))
+        print("Top Cap: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 2) + np.count_nonzero(ray_interfaces[i].surface_index == (-2))))
+        print("Mid Interface: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 3) + np.count_nonzero(ray_interfaces[i].surface_index == (-3))))
+        print("Bot Cap: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 4) + np.count_nonzero(ray_interfaces[i].surface_index == (-4))))
+        print(ray_interfaces[i].surface_index)
+
+        print("Points of intersection:")
+        print(ray_interfaces[i].intersection_point)
+
+        print("Total intensity absorbed by each surface:")
+        print("Bot Cyl: " + str(absorption_table[i, 0, 0, :]))
+        print("Top Cyl: " + str(absorption_table[i, 0, 1, :]))
+        print("Top Cap: " + str(absorption_table[i, 0, 2, :]))
+        print("Mid Interface: " + str(absorption_table[i, 0, 3, :]))
+        print("Bot Cap: " + str(absorption_table[i, 0, 4, :]))
+
+        print("\n")
+
 
 
 if __name__ == "__main__":

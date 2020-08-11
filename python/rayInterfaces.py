@@ -1,4 +1,6 @@
 # define ray_interfaces struct
+# each rayInterfaces object contains all of the data for one scatter
+# each attribute is an nparray
 class rayInterfaces(object):
     def __init__(self):
         # attributes
