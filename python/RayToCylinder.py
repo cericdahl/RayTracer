@@ -61,8 +61,8 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     # %% check inputs                                        |  Check this       |
     if len(cyl_center) != 3 or len(cyl_axis) != 3 or cylinder_radius == 0 or starting_points.shape[1] != 3 or np.size(indir,1) != 3 or starting_points.shape[0] != indir.shape[0]:
         raise Exception('Improper input to RayToCylinder')
-    cylinder_center = np.transpose(cyl_center) # 1x3 --> 3x1 (3,)
-    cylinder_axis = np.transpose(cyl_axis)
+    cylinder_center = np.transpose(cyl_center[:,np.newaxis])
+    cylinder_axis = np.transpose(cyl_axis[:,np.newaxis])
     numrays = starting_points.shape[0] # numrays = n
 
     """
@@ -81,10 +81,14 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     # % a*l^2 + b*l + c = 0, a = 1
 
     x = np.array(starting_points) - np.matlib.repmat(cylinder_center,numrays,1)
-    u = (x * np.transpose(cylinder_axis) * cylinder_axis) - x
+    #u = (x * np.transpose(cylinder_axis) * cylinder_axis) - x
+    #u = np.matmul(np.matmul(x, np.transpose(cylinder_axis)), cylinder_axis) - x
+    u = (x @ np.transpose(cylinder_axis) @ cylinder_axis) - x
 
 
-    v = (np.array(indir) * np.transpose(cylinder_axis) * cylinder_axis) - np.array(indir)
+    #v = (np.array(indir) * np.transpose(cylinder_axis) * cylinder_axis) - np.array(indir)
+    #v = np.matmul(np.matmul(np.array(indir), np.transpose(cylinder_axis)), cylinder_axis) - np.array(indir)
+    v = (np.array(indir) @ np.transpose(cylinder_axis) @ cylinder_axis) - np.array(indir)
 
     a = np.sum(np.multiply(v,v), 1)
     b = 2 * np.sum(np.multiply(u,v), 1)
@@ -98,12 +102,14 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     ############# BOOKMARK ######## 
     # distance_traveled(~(linear_cut | quad_cut),:) = NaN;
     cutIndex = np.logical_or(linear_cut, quad_cut)
-    distance_traveled[np.logical_not(cutIndex)] = np.nan
+    distance_traveled[np.logical_not(cutIndex), :] = np.nan     # [np.logical_not(cutIndex)] --> [np.logical_not(cutIndex), :]
+
 
     if np.any(linear_cut): #Might have to switch dimensions linear_cut and :
-        distance_traveled[linear_cut,:] = np.matlib.repmat(-c[linear_cut] / b[linear_cut], 2, 1) # Swapped 2 and 1
+        distance_traveled[linear_cut,:] = np.matlib.repmat((-c[linear_cut] / b[linear_cut])[:,np.newaxis], 1, 2)
     if np.any(quad_cut):
-        distance_traveled[quad_cut,:] = np.add(np.transpose(np.matlib.repmat(-.5 * b[quad_cut] / a[quad_cut], 2, 1)), (.5 * np.sqrt(b[quad_cut]**2 - 4 * a[quad_cut] * c[quad_cut]) / a[quad_cut])[:, np.newaxis] * np.array([1, -1])) # Added [:, np.newaxis], swapped 2 and 1 in first term, transposed first term, and used np.add instead of +
+        #distance_traveled[quad_cut,:] = np.add(np.matlib.repmat((-.5 * b[quad_cut] / a[quad_cut])[:,np.newaxis], 1, 2), (.5 * np.sqrt(b[quad_cut]**2 - 4 * a[quad_cut] * c[quad_cut]) / a[quad_cut])[:, np.newaxis] * np.array([1, -1]))
+        distance_traveled[quad_cut, :] = np.add(np.matlib.repmat((-.5 * b[quad_cut] / a[quad_cut])[:,np.newaxis], 1, 2), (.5 * np.sqrt(b[quad_cut]**2 - 4 * a[quad_cut] * c[quad_cut]) / a[quad_cut])[:, np.newaxis]) * np.array([1, -1])
 
 
     # %% find intersection_points
@@ -113,9 +119,13 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
 
     # %% find surface_normals
     x = intersection_points[:,:,0] - np.matlib.repmat(cylinder_center, numrays, 1) # intersection_points[:,:,0] takes the first set of quadratic solutions
-    u = (x * np.transpose(cylinder_axis) * cylinder_axis) - x
+    #u = (x * np.transpose(cylinder_axis) * cylinder_axis) - x
+    #u = np.matmul(np.matmul(x, np.transpose(cylinder_axis)), cylinder_axis) - x
+    u = (x @ np.transpose(cylinder_axis) * cylinder_axis) - x
     y = intersection_points[:,:,1] - np.matlib.repmat(cylinder_center, numrays, 1)
-    v = (y * np.transpose(cylinder_axis) * cylinder_axis) - y
+    #v = (y * np.transpose(cylinder_axis) * cylinder_axis) - y
+    #v = np.matmul(np.matmul(y, np.transpose(cylinder_axis)), cylinder_axis) - y
+    v = (y @ np.transpose(cylinder_axis) @ cylinder_axis) - y
     surface_normals = np.zeros(np.shape(intersection_points)) # Replaced 'size' w/ 'shape'
     surface_normals[:,:,0] = u / cylinder_radius
     surface_normals[:,:,1] = v / cylinder_radius

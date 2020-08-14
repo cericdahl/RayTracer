@@ -5,6 +5,7 @@ import random
 import RayTracer2
 import surface
 import matplotlib.pyplot as plt
+import sys
 
 
 def TestGeometry():
@@ -14,7 +15,7 @@ def TestGeometry():
     y = 0
     z = 2
 
-    n = 3#1000  # number of rays
+    n = 4 #1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -45,7 +46,7 @@ def TestGeometry():
     bot_cyl.shape = 'cylinder'
     bot_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
     bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (np.size(p, 0), -1))
-    bot_cyl.n_outside = np.inf
+    bot_cyl.n_outside = 10**6 # np.inf | RefractionReflectionAtInterface does not handle n=inf at the moment
     bot_cyl.n_inside = 1.5
     bot_cyl.surface_type = 'normal'
     bot_cyl.absorption = 0
@@ -57,7 +58,7 @@ def TestGeometry():
     top_cyl.shape = 'cylinder'
     top_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
     top_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 5) * (p[:, 2, :] < 10), (np.size(p, 0), -1))
-    top_cyl.n_outside = np.inf
+    top_cyl.n_outside = 10**6 #np.inf
     top_cyl.n_inside = 2
     top_cyl.surface_type = 'normal'
     top_cyl.absorption = 0
@@ -104,21 +105,21 @@ def TestGeometry():
 
 
 def main():
-    [starts, rays, surfaces] = TestGeometry()
+    epsilon = sys.float_info.epsilon
+    print("epsilon: " + str(epsilon))
+    #[starts, rays, surfaces] = TestGeometry()
 
-    [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    #[ray_interfaces, absorption_table, raytable, threshold] = RayTracer2.RayTracer2(starts, rays, surfaces)
 
-    """
-    print("ray_interfaces:")
-    print(ray_interfaces.shape)
-    print("absorption_table:")
-    print(absorption_table)
-    print(absorption_table.shape)
-    print("raytable:")
-    print(raytable)
-    """
+    for i in range(1000): # test a bunch of times
+        [starts, rays, surfaces] = TestGeometry()
+
+        [ray_interfaces, absorption_table, raytable, threshold] = RayTracer2.RayTracer2(starts, rays, surfaces)
+        report(ray_interfaces, absorption_table, raytable, threshold, epsilon)
 
 
+
+def report(ray_interfaces, absorption_table, raytable, threshold, epsilon): # print relevant info
     for i in range(len(ray_interfaces)):
         print("Scatter # " + str(i+1) + ", # of rays " + str(len(ray_interfaces[i].intersection_point)))
         print("# of times each surface is hit:")
@@ -134,13 +135,15 @@ def main():
 
         print("Total intensity absorbed by each surface:")
         print("Bot Cyl: " + str(absorption_table[i, 0, 0, :]))
+        if absorption_table[i, 0, 0, 0] > (5 * epsilon) or absorption_table[i, 0, 0, 0] < -(5 * epsilon) or absorption_table[i, 0, 0, 1] > (5 * epsilon) or absorption_table[i, 0, 0, 1] < -(5 * epsilon):
+            raise Exception("Bottom Cylinder absorbed!!!")
         print("Top Cyl: " + str(absorption_table[i, 0, 1, :]))
         print("Top Cap: " + str(absorption_table[i, 0, 2, :]))
         print("Mid Interface: " + str(absorption_table[i, 0, 3, :]))
         print("Bot Cap: " + str(absorption_table[i, 0, 4, :]))
 
         print("\n")
-
+    #print("Rays that dropped below threshold: " + str(threshold))
 
 
 if __name__ == "__main__":

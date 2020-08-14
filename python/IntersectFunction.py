@@ -6,6 +6,6 @@ def IntersectFunction(surface, sp, indir):
 	param_list = surface.param_list
 
 	#Call RayToShape with the correct parameters, and return output
-	return RayToShape.RayToShape(shape, sp, indir, param_list) #check
+	return RayToShape.RayToShape(shape, sp, indir, param_list)
 
 
