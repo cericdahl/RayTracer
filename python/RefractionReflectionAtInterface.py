@@ -140,7 +140,7 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     #print("n2: " + str(n2))
     #print("sin_incident: " + str(sin_incident_angle))
     #print("sin: " + str(sin_refracted_angle))
-    cos_refracted_angle = np.sqrt(1 - sin_refracted_angle**2)
+    cos_refracted_angle = np.sqrt(1 - sin_refracted_angle**2 + 0j)
     #print("cos: " + str(cos_refracted_angle))
 
     rs = (n1*cos_incident_angle - n2*cos_refracted_angle) / (n1*cos_incident_angle + n2*cos_refracted_angle)
