@@ -1,752 +1,148 @@
-Scatter # 1, # of rays 3
+Scatter # 1, # of rays 10000
 # of times each surface is hit:
-Bot Cyl: 0
+Bot Cyl: 2442
 Top Cyl: 0
 Top Cap: 0
-Mid Interface: 1				# what happened to this ray? drop below threshold/cut out somehow? add something to report this
-Bot Cap: 2										in RayTracer2 output?
-[-3.  4.  4.]
-Points of intersection:
-[[ 0.67878321  0.24731337  5.        ]
- [ 4.46393634 -1.2633507   0.        ]
- [-1.16375572  3.25431798  0.        ]]
+Mid Interface: 3602
+Bot Cap: 3956
 Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
+Bot Cyl: [-4.01567668e-13 -4.01567668e-13]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [2. 0.]
+Mid Interface: [ 0.00000000e+00 -5.94857497e-13]
+Bot Cap: [3956.    0.]
 
-------------------------------------------------------
 
-Scatter # 1, # of rays 3
+Scatter # 2, # of rays 4259				# 1,765 rays dropped
 # of times each surface is hit:
-Bot Cyl: 2
+Bot Cyl: 1671
+Top Cyl: 2
+Top Cap: 19
+Mid Interface: 783
+Bot Cap: 1784
+Total intensity absorbed by each surface:
+Bot Cyl: [2.0206059e-14 2.0206059e-14]
+Top Cyl: [0. 0.]
+Top Cap: [ 0. 19.]
+Mid Interface: [0. 7.]
+Bot Cap: [1784.    0.]
+
+
+Scatter # 3, # of rays 2206				# 250 dropped
+# of times each surface is hit:
+Bot Cyl: 761
+Top Cyl: 0
+Top Cap: 10
+Mid Interface: 125
+Bot Cap: 1310
+Total intensity absorbed by each surface:
+Bot Cyl: [2.77555756e-15 2.77555756e-15]
+Top Cyl: [0. 0.]
+Top Cap: [ 0. 10.]
+Mid Interface: [0. 1.]
+Bot Cap: [1310.    0.]
+
+
+Scatter # 4, # of rays 873				# 13 dropped
+# of times each surface is hit:
+Bot Cyl: 480
 Top Cyl: 0
 Top Cap: 0
-Mid Interface: 0
-Bot Cap: 1
-[-0. -0.  4.]
-Points of intersection:
-[[ 6.22510444 -7.82611492  2.20826389]
- [ 9.97591777  0.69358825  4.32991154]
- [ 1.82492004 -0.34215112  0.        ]]
+Mid Interface: 56
+Bot Cap: 337
 Total intensity absorbed by each surface:
-Bot Cyl: [-4.4408921e-16 -4.4408921e-16]
+Bot Cyl: [-1.22124533e-15 -1.22124533e-15]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [1. 0.]
+Mid Interface: [ 0.00000000e+00 -1.11022302e-16]
+Bot Cap: [337.   0.]
 
 
-Scatter # 2, # of rays 2
+Scatter # 5, # of rays 527				# 9 dropped
 # of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 1
-Bot Cap: 0
-[-0. -3.]
-Points of intersection:
-[[-9.97591777 -0.69358825  8.98973461]
- [ 7.10681853  0.49411051  5.        ]]
+Bot Cyl: 336
+Top Cyl: 1
+Top Cap: 1
+Mid Interface: 36
+Bot Cap: 153
 Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
+Bot Cyl: [3.99680289e-15 3.99680289e-15]
 Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
+Top Cap: [0. 1.]
+Mid Interface: [0.00000000e+00 5.55111512e-16]
+Bot Cap: [153.   0.]
 
 
-Scatter # 3, # of rays 1
+Scatter # 6, # of rays 365				# 8 dropped
 # of times each surface is hit:
-Bot Cyl: 0
+Bot Cyl: 275
 Top Cyl: 1
 Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-1.]
-Points of intersection:
-[[-4.21543875  9.06808007  9.22579352]]
+Mid Interface: 13
+Bot Cap: 76
 Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
+Bot Cyl: [2.22044605e-16 2.22044605e-16]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
+Mid Interface: [ 0.00000000e+00 -9.99200722e-16]
+Bot Cap: [76.  0.]
 
 
-Scatter # 4, # of rays 1
+Scatter # 7, # of rays 289				# none dropped
 # of times each surface is hit:
-Bot Cyl: 0
+Bot Cyl: 221
 Top Cyl: 1
 Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-1.]
-Points of intersection:
-[[6.960753   7.17968785 9.46185243]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0.00000000e+00 2.22044605e-16]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 5, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 1
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-1.]
-Points of intersection:
-[[ 9.19423656 -3.93268535  9.69791134]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 6, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 1
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-1.]
-Points of intersection:
-[[-0.38441781 -9.99260842  9.93397025]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 7, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 1
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[1.]
-Points of intersection:
-[[-0.38441781 -9.99260842  9.93397025]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [1. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-------------------------------------------------
-
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 1
-Bot Cap: 2
-[-3.  4.  4.]
-Points of intersection:
-[[-0.416657    4.30983828  5.        ]
- [ 0.54280041 -0.09465594  0.        ]
- [ 0.00584032 -0.21244591  0.        ]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [ 0.00000000e+00 -2.22044605e-16]
-Bot Cap: [2. 0.]
-
-----------------------------------------------------------------
-
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 1
-Bot Cap: 1
-[ 4. -3. -0.]
-Points of intersection:
-[[-1.82298576e+00 -7.59600628e-01  2.22044605e-16]
- [-8.86134469e-01  3.73257950e+00  5.00000000e+00]
- [-6.21316426e+00 -7.83559761e+00  2.11293888e+00]]
-Total intensity absorbed by each surface:
-Bot Cyl: [-2.22044605e-16 -2.22044605e-16]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [ 0.00000000e+00 -2.22044605e-16]
-Bot Cap: [1. 0.]
-
-
-Scatter # 2, # of rays 2
-# of times each surface is hit:
-Bot Cyl: 2
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.  0.]
-Points of intersection:
-[[-2.30985288  9.72957243  0.18001458]
- [-6.21316426 -7.83559761  2.11293888]]
-Total intensity absorbed by each surface:
-Bot Cyl: [2. 2.]				# Bot Cyl should not be absorbing
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
---------------------------------------------------------
-
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 2
-Bot Cap: 1
-[-3. -3.  4.]
-Points of intersection:
-[[ 1.49211139 -6.69463848  5.        ]
- [-2.41786421  5.75115756  5.        ]
- [ 0.50943168  4.09541834  0.        ]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [ 0.00000000e+00 -2.22044605e-16]
-Bot Cap: [1. 0.]
-
-
-Scatter # 2, # of rays 1			# where did other ray go?
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.]
-Points of intersection:
-[[-3.87556476  9.21845962  3.19133695]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 3, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 1
-[4.]
-Points of intersection:
-[[-1.30349163  3.10049907  0.        ]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [1. 0.]
-
-----------------------------------------------
-
-Scatter # 1, # of rays 3				# did all 3 drop below threshold?
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 3
-Bot Cap: 0
-[-3. -3. -3.]
-Points of intersection:
-[[ 0.28893316  0.45099632  5.        ]
- [ 3.93525847  2.53267584  5.        ]
- [-1.07275846 -5.1308861   5.        ]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [ 0.00000000e+00 -2.22044605e-16]
-Bot Cap: [0. 0.]
-
--------------------------------------------------
-
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 2
-[ 4. -0.  4.]
-Points of intersection:
-[[-5.55814922e+00  3.01981706e+00  0.00000000e+00]
- [-5.25000727e-01  9.98620920e+00  3.09901774e+00]
- [ 4.32510641e-01 -6.09209342e-01  2.22044605e-16]]
-Total intensity absorbed by each surface:
-Bot Cyl: [-2.22044605e-16 -2.22044605e-16]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [2. 0.]
-
-
-Scatter # 2, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 0
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 1
-Bot Cap: 0
-[-3.]
-Points of intersection:
-[[ 0.38309842 -7.28703936  5.        ]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 3, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.]
-Points of intersection:
-[[ 0.52500073 -9.9862092   4.70294679]]
-Total intensity absorbed by each surface:
-Bot Cyl: [-2.22044605e-16 -2.22044605e-16]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 4, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.]
-Points of intersection:
-[[-0.52500073  9.9862092   2.50491131]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 5, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[0.]
-Points of intersection:
-[[-0.52500073  9.9862092   2.50491131]]
-Total intensity absorbed by each surface:
-Bot Cyl: [1. 1.]				# Bot Cyl absorbing again
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
---------------------------------------------
-
-Scatter # 2, # of rays 2
-# of times each surface is hit:
-Bot Cyl: 2
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0. -0.]
-Points of intersection:
-[[ 9.60667244 -2.7770208   2.75821491]
- [-6.70479817 -7.41927769  1.42026114]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-(2, 4)
-refracted cut [[ 0. -0.  0.  0.]
- [ 0. -0.  0.  0.]]
-reflected cut [[ 1.00000000e+00 -8.14185279e-01  1.42774446e-01  0.00000000e+00]
- [ 1.00000000e+00  8.22617390e-01 -5.65265411e-01  6.92250476e-17]]
-intensity factor [[1. 1. 1. 1.]
- [1. 1. 1. 1.]]
-
-
-Scatter # 3, # of rays 2
-# of times each surface is hit:
-Bot Cyl: 2
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[0. 0.]
-Points of intersection:
-[[ 9.60667244 -2.7770208   2.75821491]
- [-6.70479817 -7.41927769  1.42026114]]
-Total intensity absorbed by each surface:
-Bot Cyl: [2. 2.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-(2, 4)
-refracted cut [[nan nan nan nan]
- [nan nan nan nan]]
-reflected cut [[nan nan nan nan]
- [nan nan nan nan]]
-intensity factor [[1. 1. 1. 1.]
- [1. 1. 1. 1.]]
-
-----------------------------------------------
-
-[0.45174942 0.49943666 0.        ]
-[-0.  0.  0.]
-[nan]					# refracted_rays[goodhit_cut,6] = nan
-[-0.]
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 1				# what happened to this ray -- not in next scatter
-Bot Cap: 1
-[-3.  4. -0.]
-Points of intersection:
-[[-4.55800293 -0.69414335  5.        ]
- [ 0.95495641 -1.4979665   0.        ]
- [ 6.00086975  7.99934762  2.30862555]]
-Total intensity absorbed by each surface:
-Bot Cyl: [-2.22044605e-16 -2.22044605e-16]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [ 0.0000000e+00 -4.4408921e-16]
-Bot Cap: [1. 0.]
-
-
-Scatter # 2, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[0.]
-Points of intersection:
-[[6.00086975 7.99934762 2.30862555]]
-Total intensity absorbed by each surface:
-Bot Cyl: [1. 1.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Rays that dropped below threshold: [array([False, False, False]), array([False, False, False]), array([False, False]), array([False, False])]
-
--------------------------------------
-
-n1: [[inf]]				# n1 could only be inf if ray were coming from outside the test geometry
-n2: [[1.5]]
-rs first: [[nan]]
-rp first: [[nan]]
-rs mid: [[nan]]
-rp mid: [[nan]]
-rs: [[nan]]
-rp: [[nan]]
-
-Scatter # 3, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[0.]
-Points of intersection:
-[[6.90450193 7.23379936 1.18553203]]
-Total intensity absorbed by each surface:
-Bot Cyl: [1. 1.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
---------------------------------------------------------
-
-n1: [1.5 1.5 1.5]
-n2: [1000000. 1000000. 1000000.]
-sin_incident: [0.1026692  0.16875438 0.25115005]
-sin: [1.54003794e-07 2.53131567e-07 3.76725082e-07]
-cos: [1. 1. 1.]
-[-999998.50792666 -999998.52151276 -999998.54807768]
-[1000001.49207332 1000001.47848717 1000001.45192218]
-n1: [1.5e+00 1.5e+00 1.0e+06]
-n2: [2.  inf 1.5]
-sin_incident: [0.99471556 0.98565814 0.25115005]
-sin: [7.46036667e-01 0.00000000e+00 1.67433370e+05]
-cos: [0.66590487 1.                nan]
-[-1.17780594        -inf         nan]
-[1.48581353        inf        nan]
-n1: [[1.5]]
-n2: [[1000000.]]
-sin_incident: [0.1026692]
-sin: [[1.54003794e-07]]
-cos: [[1.]]
-[[-999998.50792666]]
-[[1000001.49207332]]
-n1: [[1.5]]
-n2: [[1000000.]]
-sin_incident: [0.1026692]
-sin: [[1.54003794e-07]]
-cos: [[1.]]
-[[-999998.50792666]]
-[[1000001.49207332]]
-n1: [[1000000.]]
-n2: [[1.5]]
-sin_incident: [0.1026692]
-sin: [[68446.13076826]]
-cos: [[nan]]
-[[nan]]
-[[nan]]
-Scatter # 1, # of rays 3
-# of times each surface is hit:
-Bot Cyl: 3
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0. -0. -0.]
-Points of intersection:
-[[-9.55212009  2.95922316  3.03214628]
- [-9.98153367 -0.6074418   0.28790153]
- [-3.03383166 -9.52868645  4.5946643 ]]
+Mid Interface: 19
+Bot Cap: 48
 Total intensity absorbed by each surface:
 Bot Cyl: [-6.66133815e-16 -6.66133815e-16]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
+Mid Interface: [0.0000000e+00 8.8817842e-16]
+Bot Cap: [48.  0.]
 
 
-Scatter # 2, # of rays 3
+Scatter # 8, # of rays 238				# 3 dropped
 # of times each surface is hit:
-Bot Cyl: 1
+Bot Cyl: 195
+Top Cyl: 0
+Top Cap: 1
+Mid Interface: 10
+Bot Cap: 32
+Total intensity absorbed by each surface:
+Bot Cyl: [2.22044605e-16 2.22044605e-16]
+Top Cyl: [0. 0.]
+Top Cap: [0. 1.]
+Mid Interface: [0.00000000e+00 9.99200722e-16]
+Bot Cap: [32.  0.]
+
+
+Scatter # 9, # of rays 205				# none dropped
+# of times each surface is hit:
+Bot Cyl: 178
 Top Cyl: 0
 Top Cap: 0
-Mid Interface: 1
-Bot Cap: 1
-[-3.  4.  0.]
-Points of intersection:
-[[ 8.65961538 -2.68272741  5.        ]
- [-8.30306779 -0.50529614  0.        ]
- [-3.03383166 -9.52868645  4.5946643 ]]
+Mid Interface: 3
+Bot Cap: 24
 Total intensity absorbed by each surface:
-Bot Cyl: [1. 1.]
+Bot Cyl: [2.44249065e-15 2.44249065e-15]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0.00000000e+00 2.22044605e-16]
-Bot Cap: [1. 0.]
+Mid Interface: [ 0.00000000e+00 -3.33066907e-16]
+Bot Cap: [24.  0.]
 
 
-Scatter # 3, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
+Scatter # 10, # of rays 181				# none dropped		num dropped consistent with next scatter's 'escaped geometry'
+# of times each surface is hit:						mostly Bot Cyl and Mid Interface, sometimes Top Cyl
+Bot Cyl: 147
 Top Cyl: 0
 Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.]
-Points of intersection:
-[[ 9.55212009 -2.95922316  4.90356116]]
+Mid Interface: 4
+Bot Cap: 30
 Total intensity absorbed by each surface:
-Bot Cyl: [-2.22044605e-16 -2.22044605e-16]
+Bot Cyl: [-2.55351296e-15 -2.55351296e-15]
 Top Cyl: [0. 0.]
 Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 4, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[-0.]
-Points of intersection:
-[[-9.55212009  2.95922316  2.83926859]]
-Total intensity absorbed by each surface:
-Bot Cyl: [0. 0.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-
-Scatter # 5, # of rays 1
-# of times each surface is hit:
-Bot Cyl: 1
-Top Cyl: 0
-Top Cap: 0
-Mid Interface: 0
-Bot Cap: 0
-[0.]
-Points of intersection:
-[[-9.55212009  2.95922316  2.83926859]]
-Total intensity absorbed by each surface:
-Bot Cyl: [1. 1.]
-Top Cyl: [0. 0.]
-Top Cap: [0. 0.]
-Mid Interface: [0. 0.]
-Bot Cap: [0. 0.]
-
-------------------------------------------------------------
-
-n: 0
-valid intersection: [[ True  True]]
-inbounds: [[ True  True]]
-l_ray check: [[ True  True]]
-s_orientation check: [[ True  True]]
-isnan check: [[ True  True]]
-less check: [[ True  True]]
-greater check: [[ True  True]]
-l_ray before: [[2.00014959e+01 1.77635684e-15]]
-l_ray after: [[2.00014959e+01 1.77635684e-15]]
-n: 1
-valid intersection: [[False False]]
-inbounds: [[False False]]
-l_ray check: [[ True  True]]
-s_orientation check: [[ True  True]]
-isnan check: [[ True  True]]
-less check: [[ True  True]]
-greater check: [[ True  True]]
-l_ray before: [[2.00014959e+01 1.77635684e-15]]
-l_ray after: [[inf inf]]
-
---------------------------------------
-
-n: 0
-valid intersection: [[False  True]]
-inbounds: [[False  True]]
-l_ray check: [[ True  True]]
-s_orientation check: [[ True  True]]
-isnan check: [[ True  True]]
-less check: [[ True  True]]
-greater check: [[ True  True]]
-l_ray before: [[2.25651033e+01 1.77635684e-15]]
-l_ray after: [1.77635684e-15]
-ix: [1]
-ixcut: [[False]
- [ True]]
-s_orientation: [[-1.  1.]]
-s_orientation transposed: [[-1.]
- [ 1.]]
-s_orientation after: [[1.]]
-
-n: 1
-valid intersection: [[False False]]
-inbounds: [[False False]]
-l_ray check: [[ True  True]]
-s_orientation check: [[ True  True]]
-isnan check: [[ True  True]]
-less check: [[ True  True]]
-greater check: [[ True  True]]
-l_ray before: [[2.25651033e+01 1.77635684e-15]]
-l_ray after: [inf]
-ix: [0]
-ixcut: [[ True]
- [False]]
-s_orientation: [[-1.  1.]]
-s_orientation transposed: [[-1.]
- [ 1.]]
-s_orientation after: [[-1.]]
-
------------------------------------------------------
-
-n: 0				ix is the issue
-ixlist first: [[[0]
-  [1]]
- [[0]
-  [1]]
- [[0]
-  [1]]]
-ix: [1]
-ixcut first: [[[False]
-  [ True]]
- [[False]
-  [ True]]
- [[False]
-  [ True]]]
-ixcut final: [[False]
- [ True]]
-
-n: 1
-ixlist first: [[[0]
-  [1]]
- [[0]
-  [1]]
- [[0]
-  [1]]]
-ix: [0]
-ixcut first: [[[ True]
-  [False]]
- [[ True]
-  [False]]
- [[ True]
-  [False]]]
-ixcut final: [[ True]
- [False]]
-
----------------------------------------
-
-n: 0
-valid intersection: [[ True  True]]
-l_ray before: [[2.00218396e+01 1.77635684e-15]]
-l_ray after: [1.77635684e-15]
-ix: [1]
-ix: [1]
-
-n: 1
-valid intersection: [[False False]]
-l_ray before: [[2.00218396e+01 1.77635684e-15]]
-l_ray after: [inf]
-ix: [0]
-ix: [0]
+Mid Interface: [ 0.00000000e+00 -1.11022302e-16]
+Bot Cap: [30.  0.]

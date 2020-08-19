@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def TestGeometry():
+def TestGeometry(z_in):
     # First, create ray starting points and isotropic rays
     # Coordinates of startingpoint -- same for all rays
     x = 0
     y = 0
-    z = 2
+    z = z_in
 
-    n = 4 #1000  # number of rays
+    n = 1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -71,7 +71,7 @@ def TestGeometry():
     top.param_list = [np.array([0, 0, 10]), np.array([0, 0, 1])]
     top.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2) < 100, (p.shape[0], -1))
     # Direction of normal vector considered 'outside'
-    top.n_outside = np.inf
+    top.n_outside = 10**6 #np.inf
     top.n_inside = 2
     top.surface_type = 'normal'
     top.absorption = 1
@@ -96,7 +96,7 @@ def TestGeometry():
     bottom.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1])]
     bottom.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
     bottom.n_outside = 1.5
-    bottom.n_inside = np.inf
+    bottom.n_inside = 10**6 #np.inf
     bottom.surface_type = 'normal'
     bottom.absorption = 1
     surface_list.append(bottom)
@@ -107,19 +107,57 @@ def TestGeometry():
 def main():
     epsilon = sys.float_info.epsilon
     print("epsilon: " + str(epsilon))
-    #[starts, rays, surfaces] = TestGeometry()
 
-    #[ray_interfaces, absorption_table, raytable, threshold] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    z = 7
 
-    for i in range(1000): # test a bunch of times
-        [starts, rays, surfaces] = TestGeometry()
+    [starts, rays, surfaces] = TestGeometry(z)
+    [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    report(ray_interfaces, absorption_table, raytable, epsilon)
 
-        [ray_interfaces, absorption_table, raytable, threshold] = RayTracer2.RayTracer2(starts, rays, surfaces)
-        report(ray_interfaces, absorption_table, raytable, threshold, epsilon)
+    # ri_data = [] # collect data from each trial
+    # absorption_data = []
+    # absorbed_bot = []
+    # absorbed_top = []
+    #
+    # for i in range(1): # test a bunch of times
+    #     for z in np.arange(.2, 10, .2): # move z up the center of cylinder in steps of 0.2
+    #         [starts, rays, surfaces] = TestGeometry(z)
+    #
+    #         [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    #
+    #         ri_data.append(ray_interfaces)
+    #         absorption_data.append(absorption_table)
+    #
+    #         absorbed_bot.append(np.sum(np.count_nonzero(x.surface_index == 4) + np.count_nonzero(x.surface_index == (-4)) for x in ray_interfaces)) # num of rays absorbed on bottom
+    #         absorbed_top.append(np.sum(np.count_nonzero(x.surface_index == 2) + np.count_nonzero(x.surface_index == (-2)) for x in ray_interfaces))
+    #
+    #         print("z = " + str(z))
+    #         report(ray_interfaces, absorption_table, raytable, epsilon)
+    # ri_data = np.array(ri_data)
+    #
+    #
+    # # plot
+    # x_data = np.arange(.2, 10, .2)
+    # width = 0.05
+    # labels = np.arange(.2, 10, .2).round(decimals=1) # fix x-labels
+    #
+    # fig, ax = plt.subplots()
+    #
+    # ax.bar(x_data, absorbed_bot, width, label='absorbed bottom')
+    # ax.bar(x_data, absorbed_top, width, bottom=absorbed_bot, label='absorbed top')
+    # plt.xticks(np.arange(.2, 10, .2), labels, size='small', rotation='vertical')
+    #
+    # ax.set_ylabel('# of rays absorbed')
+    # ax.set_xlabel('z-start')
+    # ax.set_title('# of rays absorbed by surface')
+    # ax.legend()
+    #
+    # plt.show()
 
 
 
-def report(ray_interfaces, absorption_table, raytable, threshold, epsilon): # print relevant info
+
+def report(ray_interfaces, absorption_table, raytable, epsilon): # print relevant info
     for i in range(len(ray_interfaces)):
         print("Scatter # " + str(i+1) + ", # of rays " + str(len(ray_interfaces[i].intersection_point)))
         print("# of times each surface is hit:")
@@ -128,22 +166,23 @@ def report(ray_interfaces, absorption_table, raytable, threshold, epsilon): # pr
         print("Top Cap: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 2) + np.count_nonzero(ray_interfaces[i].surface_index == (-2))))
         print("Mid Interface: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 3) + np.count_nonzero(ray_interfaces[i].surface_index == (-3))))
         print("Bot Cap: " + str(np.count_nonzero(ray_interfaces[i].surface_index == 4) + np.count_nonzero(ray_interfaces[i].surface_index == (-4))))
-        print(ray_interfaces[i].surface_index)
+        #print(ray_interfaces[i].surface_index)
 
-        print("Points of intersection:")
-        print(ray_interfaces[i].intersection_point)
+        #print("Points of intersection:")
+        #print(ray_interfaces[i].intersection_point)
 
         print("Total intensity absorbed by each surface:")
         print("Bot Cyl: " + str(absorption_table[i, 0, 0, :]))
-        if absorption_table[i, 0, 0, 0] > (5 * epsilon) or absorption_table[i, 0, 0, 0] < -(5 * epsilon) or absorption_table[i, 0, 0, 1] > (5 * epsilon) or absorption_table[i, 0, 0, 1] < -(5 * epsilon):
-            raise Exception("Bottom Cylinder absorbed!!!")
+        #if absorption_table[i, 0, 0, 0] > (5 * epsilon) or absorption_table[i, 0, 0, 0] < -(5 * epsilon) or absorption_table[i, 0, 0, 1] > (5 * epsilon) or absorption_table[i, 0, 0, 1] < -(5 * epsilon):
+            #raise Exception("Bottom Cylinder absorbed!!!")
         print("Top Cyl: " + str(absorption_table[i, 0, 1, :]))
         print("Top Cap: " + str(absorption_table[i, 0, 2, :]))
         print("Mid Interface: " + str(absorption_table[i, 0, 3, :]))
         print("Bot Cap: " + str(absorption_table[i, 0, 4, :]))
 
+        print("Rays escaping geometry: " + str(absorption_table[i,2]))
+
         print("\n")
-    #print("Rays that dropped below threshold: " + str(threshold))
 
 
 if __name__ == "__main__":

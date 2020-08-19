@@ -93,7 +93,7 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     reflected_rays[:,6:10] = 0
 
     # %% find interface normals
-    cos_incident_angle = np.sum(-incoming_rays[:,0:3]*surface_normals, 1)
+    cos_incident_angle = np.sum(-incoming_rays[:,0:3]*surface_normals, axis=1)
     goodhit_cut = cos_incident_angle > 0
 
     interface_normals = np.cross(-incoming_rays[:,0:3], surface_normals, axis=1)
@@ -103,8 +103,8 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
         interface_normals[goodinterface_cut,:] = interface_normals[goodinterface_cut,:] / np.matlib.repmat(sin_incident_angle[goodinterface_cut,np.newaxis],1,3)
 
     # %% rotate stokes parameters to new basis
-    c_rot = np.sum(interface_normals * incoming_rays[:,3:6], 1)
-    s_rot = np.sum(np.cross(interface_normals,incoming_rays[:,3:6],axis=1) * incoming_rays[:,0:3], 1)
+    c_rot = np.sum(interface_normals * incoming_rays[:,3:6], axis=1)
+    s_rot = np.sum(np.cross(interface_normals,incoming_rays[:,3:6],axis=1) * incoming_rays[:,0:3], axis=1)
     c2_rot = c_rot**2 - s_rot**2
     s2_rot = 2*c_rot*s_rot
     # % for scalar c2_rot and s2_rot, we would write:
@@ -135,18 +135,17 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     amplitudes[:,2,1] = amplitudes[:,1,0]
 
     # %% calculated reflected and refracted amplitudes
-    sin_refracted_angle = sin_incident_angle * n1 / n2
-    #print("n1: " + str(n1))
-    #print("n2: " + str(n2))
-    #print("sin_incident: " + str(sin_incident_angle))
-    #print("sin: " + str(sin_refracted_angle))
-    cos_refracted_angle = np.sqrt(1 - sin_refracted_angle**2)
-    #print("cos: " + str(cos_refracted_angle))
+    sin_refracted_angle = sin_incident_angle * n1 / n2  # sin sometimes > 1
+    print("n1: " + str(n1))
+    print("n2: " + str(n2))
+    print("sin_incident: " + str(sin_incident_angle))
+    print("sin: " + str(sin_refracted_angle))
+    cos_refracted_angle = np.sqrt(1 - sin_refracted_angle**2 + 0j)
+    print("cos: " + str(cos_refracted_angle))
 
     rs = (n1*cos_incident_angle - n2*cos_refracted_angle) / (n1*cos_incident_angle + n2*cos_refracted_angle)
-    #print(n1*cos_incident_angle - n2*cos_refracted_angle)
-    #print(n1*cos_incident_angle + n2*cos_refracted_angle)
     rp = -(n1*cos_refracted_angle - n2*cos_incident_angle) / (n1*cos_refracted_angle + n2*cos_incident_angle)
+    print("rs: " + str(rs))
 
     rs[np.logical_or(n2==np.inf, n2==-np.inf)] = -1
     rp[np.logical_or(n2==np.inf, n2==-np.inf)] = 1
@@ -154,15 +153,14 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     ts = np.abs(np.sqrt(1-np.conj(rs)*rs))
     tp = np.abs(np.sqrt(1-np.conj(rp)*rp))
 
-    refracted_amplitudes = amplitudes * np.tile(np.reshape([ts, tp],(-1,1,2)),(1, 3, 1)) # refracted and reflected turned nan+nanj !
+    refracted_amplitudes = amplitudes * np.tile(np.reshape([ts, tp],(-1,1,2)),(1, 3, 1))
+    print("refracted amp: " + str(refracted_amplitudes))
     reflected_amplitudes = amplitudes * np.tile(np.reshape([rs, rp],(-1,1,2)),(1, 3, 1))
 
     # %% get back to stokes parameters
     if np.any(goodhit_cut):
-        warnings.filterwarnings('ignore') # ignore ComplexWarning here, want to get rid of imaginary parts | MIGHT BE RESULTING IN NaNs
+        warnings.filterwarnings('ignore') # ignore ComplexWarning here, want to get rid of imaginary parts
         refracted_rays[goodhit_cut,6] = np.sum(np.sum(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:],axis=2),axis=1)
-        #print(refracted_rays[goodhit_cut,6])
-        #print(refracted_rays[goodhit_cut, 7])
         refracted_rays[goodhit_cut,7] = (-np.sum(np.diff(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:],1,axis=2),axis=1))[:,0]
         refracted_rays[goodhit_cut,8] = np.sum(np.real(2 * np.conj(refracted_amplitudes[goodhit_cut,:,0]) * refracted_amplitudes[goodhit_cut,:,1]),axis=1)
         refracted_rays[goodhit_cut,9] = np.sum(np.imag(2 * np.conj(refracted_amplitudes[goodhit_cut,:,0]) * refracted_amplitudes[goodhit_cut,:,1]),axis=1)
@@ -171,6 +169,8 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
         reflected_rays[goodhit_cut,7] = (-np.sum(np.diff(np.conj(reflected_amplitudes[goodhit_cut,:,:]) * reflected_amplitudes[goodhit_cut,:,:],1,2),axis=1))[:,0]
         reflected_rays[goodhit_cut,8] = np.sum(np.real(2 * np.conj(reflected_amplitudes[goodhit_cut,:,0]) * reflected_amplitudes[goodhit_cut,:,1]),axis=1)
         reflected_rays[goodhit_cut,9] = np.sum(np.imag(2 * np.conj(reflected_amplitudes[goodhit_cut,:,0]) * reflected_amplitudes[goodhit_cut,:,1]),axis=1)
+        print("\n")
+        warnings.filterwarnings('default')
 
     # %% consider surface_normal to be -x, interface_normal to be +z
     new_yaxis = np.cross(surface_normals, interface_normals, axis=1)
@@ -184,7 +184,8 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
         reflected_rays[goodcut,0:3] = np.matlib.repmat(cos_incident_angle[goodcut,np.newaxis],1,3) * surface_normals[goodcut,:] - np.matlib.repmat(sin_incident_angle[goodcut,np.newaxis],1,3) * new_yaxis[goodcut,:]
 
     # %% calculated refracted ray direction
-    total_internal_reflection_cut = np.logical_and(goodcut, sin_refracted_angle) >= 1
+    total_internal_reflection_cut = np.logical_and(goodcut, sin_refracted_angle >= 1)
+    print("tir cut: " + str(total_internal_reflection_cut))
     refracted_cut = np.logical_and(goodcut, ~total_internal_reflection_cut)
     if len(refracted_cut.shape) > 1:
         refracted_cut = refracted_cut.flatten() # if refracted cut (1,1), must be converted to singelton (1,) for indexing
@@ -195,16 +196,18 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
 
 
     if np.any(refracted_cut):
-        refracted_rays[refracted_cut, 0:3] = -np.matlib.repmat(cos_refracted_angle[refracted_cut,np.newaxis],1,3) * surface_normals[refracted_cut,:] - np.matlib.repmat(sin_refracted_angle[refracted_cut,np.newaxis],1,3) * new_yaxis[refracted_cut,:]
+        refracted_rays[refracted_cut, 0:3] = -np.matlib.repmat(np.real(cos_refracted_angle[refracted_cut,np.newaxis]),1,3) * surface_normals[refracted_cut,:] - np.matlib.repmat(np.real(sin_refracted_angle[refracted_cut,np.newaxis]),1,3) * new_yaxis[refracted_cut,:]
 
     if np.any(total_internal_reflection_cut):
         if np.any(np.logical_and(total_internal_reflection_cut, (tir_handling<0))):
             refracted_rays[np.logical_and(total_internal_reflection_cut[:,np.newaxis], tir_handling<0).flatten(), 0:3] = -new_yaxis[np.logical_and(total_internal_reflection_cut[:,np.newaxis], tir_handling<0).flatten(),:]
 
-        if np.any(np.logical_and(total_internal_reflection_cut, (tir_handling>=0))):
+        if np.any(np.logical_and(total_internal_reflection_cut, (tir_handling>=0))): # check
             refracted_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)), 0:6] = reflected_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)),0:6]
             refracted_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)), 6:10] = reflected_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)),6:10] * np.matlib.repmat(tir_handling[np.logical_and(total_internal_reflection_cut, (tir_handling>=0))],1,4)
 
     # %% all done!
+    print("check refracted: " + str(refracted_rays))
+    print("check reflected: " + str(reflected_rays))
     return [refracted_rays, reflected_rays]
     

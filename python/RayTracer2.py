@@ -189,7 +189,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
     #instantiate return value containers
     ray_interfaces = []
     raytable = []
-    threshold_report = [] # collects info on rays that drop below threshold
 
     #parse inputs into variable
     if (np.size(follow_thresh) == 1 and follow_thresh == 0):
@@ -264,6 +263,8 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if num_scatters >= max_scatters:
             break
         num_scatters += 1
+        print("scatter #: " + str(num_scatters))
+        print("\n")
         
 #        %% find next scattering surface for each ray
 #        % initialize the variables containing scatter properties
@@ -408,7 +409,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         if np.any(rayleigh_scatter_cut):
             six_next[rayleigh_scatter_cut] = 0
             l_next[rayleigh_scatter_cut] = l_to_bulkscatter[rayleigh_scatter_cut]
-            p_next[rayleigh_scatter_cut, :] = p_start[rayleigh_scatter_cut, :] + np.matlib.repmat(l_to_bulkscatter[rayleigh_scatter_cut], 1, 3) * incoming_rays[rayleigh_scatter_cut, 0:3]
+            p_next[rayleigh_scatter_cut, :] = p_start[rayleigh_scatter_cut, :] + np.matlib.repmat(l_to_bulkscatter[rayleigh_scatter_cut, np.newaxis], 1, 3) * incoming_rays[rayleigh_scatter_cut, 0:3]
         
 #        %% Now apply bulk absorption
         trans_frac = np.exp(-l_next / abslength_next[:,0])
@@ -435,10 +436,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         
 #        % apply the absorption coefficient for all surfaces
         if np.any(surface_scatter_cut): # ISSUE IS WITH refracted/reflected_rays[surface_scatter_cut,6:10] TURNING NaN
-            #print((refracted_rays[surface_scatter_cut,6:10] * np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)).shape)
-            #print("refracted cut " + str(refracted_rays[surface_scatter_cut,6:10]))
-            #print("reflected cut " + str(reflected_rays[surface_scatter_cut,6:10]))
-            #print("intensity factor " + str(np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)))
             refracted_rays[surface_scatter_cut,6:10] = refracted_rays[surface_scatter_cut,6:10] * np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)
             reflected_rays[surface_scatter_cut,6:10] = reflected_rays[surface_scatter_cut,6:10] * np.matlib.repmat((1-abs_next[surface_scatter_cut])[:,np.newaxis],1,4)
         
@@ -509,8 +506,6 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
 #        % follow reflected and refracted rays that are above the follow_threshold
         refracted_rays_to_follow = np.logical_and(scatter_cut, (refracted_rays[:,6] > follow_threshold[0]))
         reflected_rays_to_follow = np.logical_and(scatter_cut, (reflected_rays[:,6] > follow_threshold[1]))
-        threshold_report.append(np.logical_and(scatter_cut, refracted_rays[:, 6] < follow_threshold[0]))
-        threshold_report.append(np.logical_and(scatter_cut, reflected_rays[:, 6] < follow_threshold[1]))
                 
         for i_s in range(np.size(surfacelist)):
             inward_cut = smix_next == i_s
@@ -535,4 +530,4 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         
     absorption_table = absorption_table[0:num_scatters, :, :, :]
     
-    return [np.array(ray_interfaces), absorption_table, raytable, threshold_report]
+    return [np.array(ray_interfaces), absorption_table, raytable]
