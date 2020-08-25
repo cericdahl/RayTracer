@@ -15,7 +15,7 @@ def TestGeometry(z_in):
     y = 0
     z = z_in
 
-    n = 1000 #0000  # number of rays
+    n = 1000 # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -27,8 +27,6 @@ def TestGeometry(z_in):
     test_rays = np.zeros((n, 10))
     test_rays[..., 3] = 1
     test_rays[..., 6] = 1
-
-    #test_rays = np.array([[0.76695846,  0.61866829,  0.17036511, 1, 0, 0, 1, 0, 0, 0], [-0.12737079, -0.21607896, -0.96803232, 1, 0, 0, 1, 0, 0, 0], [0.56607339,  0.01829272,  0.82415187, 1, 0, 0, 1, 0, 0, 0]])
 
     # Assign initial forward directions in spherical coords for easier isotropism
     for i in range(n):
@@ -110,38 +108,25 @@ def main():
     epsilon = sys.float_info.epsilon
     print("epsilon: " + str(epsilon))
 
-    z = 7
-
-    while True:
-        [starts, rays, surfaces] = TestGeometry(z)
-        [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
-        report(ray_interfaces, absorption_table, raytable, epsilon)
-        if np.any(absorption_table[:,2]):
-            break
-
-    # [starts, rays, surfaces] = TestGeometry(z)
-    # [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
-    # report(ray_interfaces, absorption_table, raytable, epsilon)
-
     ri_data = [] # collect data from each trial
     absorption_data = []
     absorbed_bot = []
     absorbed_top = []
 
-    # for i in range(1): # test a bunch of times
-    #     for z in np.arange(.2, 10, .2): # move z up the center of cylinder in steps of 0.2
-    #         [starts, rays, surfaces] = TestGeometry(z)
-    #
-    #         [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
-    #
-    #         ri_data.append(ray_interfaces)
-    #         absorption_data.append(absorption_table)
-    #
-    #         absorbed_bot.append(sum((np.count_nonzero(x.surface_index == 4) + np.count_nonzero(x.surface_index == (-4)) for x in ray_interfaces))) # num of rays absorbed on bottom
-    #         absorbed_top.append(sum((np.count_nonzero(x.surface_index == 2) + np.count_nonzero(x.surface_index == (-2)) for x in ray_interfaces)))
-    #
-    #         #print("z = " + str(z))
-    #         #report(ray_interfaces, absorption_table, raytable, epsilon)
+    for i in range(1): # test a bunch of times
+        for z in np.arange(.2, 10, .2): # move z up the center of cylinder in steps of 0.2
+            [starts, rays, surfaces] = TestGeometry(z)
+
+            [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+
+            ri_data.append(ray_interfaces)
+            absorption_data.append(absorption_table)
+
+            absorbed_bot.append(sum((np.count_nonzero(x.surface_index == 4) + np.count_nonzero(x.surface_index == (-4)) for x in ray_interfaces))) # num of rays absorbed on bottom
+            absorbed_top.append(sum((np.count_nonzero(x.surface_index == 2) + np.count_nonzero(x.surface_index == (-2)) for x in ray_interfaces)))
+
+            print("z = " + str(z))
+            report(ray_interfaces, absorption_table, raytable, epsilon)
     # ri_data = np.array(ri_data)
     #
     #

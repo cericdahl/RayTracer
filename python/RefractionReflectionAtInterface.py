@@ -116,7 +116,6 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     # %     incoming_rays(goodinterface_cut,8:9) = incoming_rays(goodinterface_cut,8:9) * rotmat;
     # % but instead we do it one element at a time
         old_polarization = incoming_rays[goodinterface_cut,7:9]
-        #print("c2: " + str((c2_rot[goodinterface_cut] * old_polarization[:,0]).shape))
         incoming_rays[goodinterface_cut,7] = old_polarization[:,0]*c2_rot[goodinterface_cut] - old_polarization[:,1]*s2_rot[goodinterface_cut]
         incoming_rays[goodinterface_cut,8] = old_polarization[:,0]*s2_rot[goodinterface_cut] + old_polarization[:,1]*c2_rot[goodinterface_cut]
         refracted_rays[goodinterface_cut,3:10] = incoming_rays[goodinterface_cut,3:10]
@@ -135,31 +134,19 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     amplitudes[:,2,1] = amplitudes[:,1,0]
 
     # %% calculated reflected and refracted amplitudes
-    #print("n1: " + str(n1))
-    #print("n2: " + str(n2))
-    sin_refracted_angle = sin_incident_angle * n1 / n2  # sin sometimes > 1
-    #print("sin: " + str(sin_refracted_angle))
+    sin_refracted_angle = sin_incident_angle * n1 / n2
     cos_refracted_angle = np.sqrt(1 - sin_refracted_angle**2 + 0j)
-    #print("cos: " + str(cos_refracted_angle))
 
     rs = (n1*cos_incident_angle - n2*cos_refracted_angle) / (n1*cos_incident_angle + n2*cos_refracted_angle)
     rp = -(n1*cos_refracted_angle - n2*cos_incident_angle) / (n1*cos_refracted_angle + n2*cos_incident_angle)
-    #print("rs bef: " + str(rs))
-    #print("rp bef: " + str(rp))
 
     rs[np.logical_or(n2==np.inf, n2==-np.inf)] = -1
     rp[np.logical_or(n2==np.inf, n2==-np.inf)] = 1
-    #print("rs: " + str(rs))
-    #print("rp: " + str(rp))
 
     ts = np.abs(np.sqrt(1-np.conj(rs)*rs))
     tp = np.abs(np.sqrt(1-np.conj(rp)*rp))
-    #print("ts: " + str(ts))
-    #print("tp: " + str(tp))
 
-    refracted_amplitudes = amplitudes * np.tile(np.reshape(np.transpose([ts, tp]),(-1,1,2)),(1, 3, 1))
-    print(ts.shape)
-    print("SHAPE CHEEECK: " + str(np.array([ts, tp]).shape))
+    refracted_amplitudes = amplitudes * np.tile(np.reshape(np.transpose([ts, tp]),(-1,1,2)),(1, 3, 1)) # must be transposed for MATLAB concatenation equivalence
     reflected_amplitudes = amplitudes * np.tile(np.reshape(np.transpose([rs, rp]),(-1,1,2)),(1, 3, 1))
 
     # %% get back to stokes parameters
@@ -210,10 +197,10 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
             refracted_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)), 6:10] = reflected_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)),6:10] * np.matlib.repmat(tir_handling[np.logical_and(total_internal_reflection_cut, (tir_handling>=0))],1,4)
 
     # %% all done!
-    print("incoming: " + str(incoming_rays[:]))
-    print("reflected: " + str(reflected_rays[:]))
-    print("refracted: " + str(refracted_rays[:]))
-    print("refracted check: " + str(refracted_rays[:, 0:3]) + str(refracted_rays[:, 6]))
-    print("\n")
+    # print("incoming: " + str(incoming_rays[:]))
+    # print("reflected: " + str(reflected_rays[:]))
+    # print("refracted: " + str(refracted_rays[:]))
+    # print("refracted check: " + str(refracted_rays[:, 0:3]) + str(refracted_rays[:, 6]))
+    # print("\n")
     return [refracted_rays, reflected_rays]
     
