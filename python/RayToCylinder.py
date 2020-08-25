@@ -90,9 +90,9 @@ def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius)
     #v = np.matmul(np.matmul(np.array(indir), np.transpose(cylinder_axis)), cylinder_axis) - np.array(indir)
     v = (np.array(indir) @ np.transpose(cylinder_axis) @ cylinder_axis) - np.array(indir)
 
-    a = np.sum(np.multiply(v,v), 1)
-    b = 2 * np.sum(np.multiply(u,v), 1)
-    c = np.sum(np.multiply(u,u), 1) - cylinder_radius**2
+    a = np.sum(v**2, 1)
+    b = 2 * np.sum(u * v, 1)
+    c = np.sum(u**2, 1) - cylinder_radius**2
 
     linear_cut = (np.logical_and(np.equal(a, 0), np.not_equal(b, 0)))
     quad_cut = (np.not_equal(a, 0))
