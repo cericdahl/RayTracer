@@ -275,7 +275,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         abs_next = np.zeros(p_start.shape[0])      # absorption at scatter
         six_next = np.zeros(p_start.shape[0])      # scatter surface index
         surfacetype_next = np.zeros(p_start.shape[0])  # surface type
-        unifiedsurface_next = np.zeros([p_start.shape[0],5])  # surface parameters at scatter
+        unifiedsurface_next = np.zeros((p_start.shape[0],5))  # surface parameters at scatter
         rayleigh_next = np.zeros((p_start.shape[0],2)) + np.inf  # Rayleigh scattering length before/after scatter
         abslength_next = np.zeros((p_start.shape[0],2)) + np.inf  # Bulk Absorption length before/after scatter
 

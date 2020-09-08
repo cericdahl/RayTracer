@@ -15,7 +15,7 @@ def TestGeometry(z_in):
     y = 0
     z = z_in
 
-    n = 1000 # number of rays
+    n = 10 # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -46,9 +46,10 @@ def TestGeometry(z_in):
     bot_cyl.shape = 'cylinder'
     bot_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
     bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (np.size(p, 0), -1))
-    bot_cyl.n_outside = np.inf #10**6 # np.inf | RefractionReflectionAtInterface does not handle n=inf at the moment
+    bot_cyl.n_outside = 1.5
     bot_cyl.n_inside = 1.5
-    bot_cyl.surface_type = 'normal'
+    bot_cyl.surface_type = 'unified'
+    bot_cyl.unifiedparams = [0, 0, 0, 0, 0]
     bot_cyl.absorption = 0
     surface_list.append(bot_cyl)
 
@@ -58,9 +59,10 @@ def TestGeometry(z_in):
     top_cyl.shape = 'cylinder'
     top_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
     top_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] >= 5) * (p[:, 2, :] < 10), (np.size(p, 0), -1))
-    top_cyl.n_outside = np.inf #10**6 #np.inf
+    top_cyl.n_outside = 1.5
     top_cyl.n_inside = 2
-    top_cyl.surface_type = 'normal'
+    top_cyl.surface_type = 'unified'
+    top_cyl.unifiedparams = [0, 0, 0, 0, 0]
     top_cyl.absorption = 0
     surface_list.append(top_cyl)
 
@@ -71,7 +73,7 @@ def TestGeometry(z_in):
     top.param_list = [np.array([0, 0, 10]), np.array([0, 0, 1])]
     top.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2) < 100, (p.shape[0], -1))
     # Direction of normal vector considered 'outside'
-    top.n_outside = np.inf #10**6 #np.inf
+    top.n_outside = 1.5
     top.n_inside = 2
     top.surface_type = 'normal'
     top.absorption = 1
@@ -96,7 +98,7 @@ def TestGeometry(z_in):
     bottom.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1])]
     bottom.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
     bottom.n_outside = 1.5
-    bottom.n_inside = np.inf #10**6 #np.inf
+    bottom.n_inside = 1.5
     bottom.surface_type = 'normal'
     bottom.absorption = 1
     surface_list.append(bottom)
@@ -114,7 +116,7 @@ def main():
     absorbed_top = []
 
     for i in range(1): # test a bunch of times
-        for z in np.arange(.2, 10, .2): # move z up the center of cylinder in steps of 0.2
+        for z in np.arange(.2, .4, .2): # move z up the center of cylinder in steps of 0.2
             [starts, rays, surfaces] = TestGeometry(z)
 
             [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
@@ -127,9 +129,11 @@ def main():
 
             print("z = " + str(z))
             report(ray_interfaces, absorption_table, raytable, epsilon)
-    # ri_data = np.array(ri_data)
-    #
-    #
+
+
+    ri_data = np.array(ri_data)
+
+
     # # plot
     # x_data = np.arange(.2, 10, .2)
     # width = 0.05
