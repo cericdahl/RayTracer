@@ -79,11 +79,29 @@ def RayToTorus(starting_points, indir, torus_center, torus_axis, r1, r2):
                                              a[quad_cut, 2])) * np.array([1, -1])
         distance_traveled[quad_cut, 2:4] = np.nan
 
-    # if any(cubic_cut)
-    #     for ix = ( find(cubic_cut)' )
-    #         distance_traveled(ix,1:3) = roots(a(ix,2:5));
-    #     end
-    #     distance_traveled(cubic_cut,4) = NaN;
-    # end
+    if np.any(cubic_cut):
+        for ix in np.transpose(np.nonzero(cubic_cut)):
+            distance_traveled[ix, 0:3] = np.roots(a[ix, 1:5])
+        distance_traveled[cubic_cut, 3] = np.nan
 
+    if np.any(quartic_cut):
+        for ix in np.transpose(np.nonzero(quartic_cut)):
+            distance_traveled[ix, :] = np.roots(a[ix, :])
+
+    # find intersection_points
+    intersection_points = starting_points[:, :, np.newaxis] + distance_traveled[:, np.newaxis, :] * indir[:, :, np.newaxis] # check reshaping
+
+    # find surface_normals
+    surface_normals = np.zeros(intersection_points.shape)
+    for i_l in range(4):
+        x = intersection_points[:, :, i_l] - np.matlib.repmat(torus_center, numrays, 1)
+        y = (x @ np.transpose(torus_axis) @ torus_axis)
+        u = x - y
+        surface_normals[:, :, i_l] = (1 / r2) @ (u * (1 - (r1 / np.matlib.repmat(np.sqrt(np.sum(u**2, axis=1))[:,np.newaxis], 1, 3))) + y)
+
+    crossing_into = np.round_(-np.sign(np.sum(indir[:, :, np.newaxis] * surface_normals, axis=1)))
+    surface_normals = surface_normals * crossing_into[:, np.newaxis, :]
+    crossing_into = np.reshape(crossing_into, (-1, 4))
+
+    return [intersection_points, surface_normals, distance_traveled, crossing_into]
 
