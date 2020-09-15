@@ -26,7 +26,7 @@ import sys
 import numpy as np
 import numpy.matlib
 
-def RayToQuadsurface(starting_points, indir, q, p, r):
+def RayToQuadSurface(starting_points, indir, q, p, r):
 
     intersection_points = []
     surface_normals = []
