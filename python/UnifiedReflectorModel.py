@@ -178,6 +178,7 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
             # % roll dice to see whether we're following the refraction or the
             # % reflection
             reflect_here = (np.random.random_sample((np.size(facet_normals,0),1)) > (this_refractedray[:,6] / (this_refractedray[:,6] + this_reflectedray[:,6]))[:,np.newaxis]).flatten() # for indexing
+            print("reflect here: " + str(reflect_here))
             
             if np.any(np.isnan(this_refractedray[:])):
                 print('whoops! -- this_refractedray has NaN elements')
