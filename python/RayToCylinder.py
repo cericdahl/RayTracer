@@ -49,7 +49,6 @@
     # RayToCylinder(starting_points, incoming_directions, cylinder_center, cylinder_axis, cylinder_radius)
 
 import numpy as np
-import numpy.matlib
 
 def RayToCylinder(starting_points, indir, cyl_center, cyl_axis, cylinder_radius):
 

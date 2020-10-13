@@ -17,9 +17,9 @@
 
 import sys
 import numpy as np
-import numpy.matlib
 
 def RayToTorus(starting_points, indir, torus_center, torus_axis, r1, r2):
+    params = len(locals())
 
     intersection_points = []
     surface_normals = []
@@ -27,7 +27,7 @@ def RayToTorus(starting_points, indir, torus_center, torus_axis, r1, r2):
     crossing_into = []
 
     # check inputs
-    if len(sys.argv) < 4 or len(torus_center) != 3 or len(torus_axis) != 3 or r1.size != 1 or r2.size != 1 or \
+    if params < 4 or len(torus_center) != 3 or len(torus_axis) != 3 or r1.size != 1 or r2.size != 1 or \
         starting_points.shape[1] != 3 or indir.shape[1] != 3 or starting_points.shape[0] != indir.shape[0]:
         raise Exception('Improper input to RayToTorus')
     torus_center = np.transpose(torus_center[:,np.newaxis])

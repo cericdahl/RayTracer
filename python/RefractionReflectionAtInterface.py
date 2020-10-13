@@ -162,17 +162,17 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
     # %% get back to stokes parameters
     if np.any(goodhit_cut):
         warnings.filterwarnings('ignore') # ignore ComplexWarning here, want to get rid of imaginary parts
-        print("Checking Amplitudes Refracted:")
-        print(np.sum(np.sum(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:], axis=2), axis=1))
+        #print("Checking Amplitudes Refracted:")
+        #print(np.sum(np.sum(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:], axis=2), axis=1))
         refracted_rays[goodhit_cut,6] = np.sum(np.sum(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:],axis=2),axis=1)
         refracted_rays[goodhit_cut,7] = (-np.sum(np.diff(np.conj(refracted_amplitudes[goodhit_cut,:,:]) * refracted_amplitudes[goodhit_cut,:,:],1,axis=2),axis=1))[:,0]
         refracted_rays[goodhit_cut,8] = np.sum(np.real(2 * np.conj(refracted_amplitudes[goodhit_cut,:,0]) * refracted_amplitudes[goodhit_cut,:,1]),axis=1)
         refracted_rays[goodhit_cut,9] = np.sum(np.imag(2 * np.conj(refracted_amplitudes[goodhit_cut,:,0]) * refracted_amplitudes[goodhit_cut,:,1]),axis=1)
 
-        print("Checking Amplitudes Reflected:")
-        print(reflected_amplitudes[goodhit_cut, :, :])
-        print(np.conj(reflected_amplitudes[goodhit_cut,:,:]))
-        print(np.sum(np.sum(np.conj(reflected_amplitudes[goodhit_cut,:,:]) * reflected_amplitudes[goodhit_cut,:,:], axis=2), axis=1))
+        #print("Checking Amplitudes Reflected:")
+        #print(reflected_amplitudes[goodhit_cut, :, :])
+        #print(np.conj(reflected_amplitudes[goodhit_cut,:,:]))
+        #print(np.sum(np.sum(np.conj(reflected_amplitudes[goodhit_cut,:,:]) * reflected_amplitudes[goodhit_cut,:,:], axis=2), axis=1))
 
         reflected_rays[goodhit_cut,6] = np.sum(np.sum(np.conj(reflected_amplitudes[goodhit_cut,:,:]) * reflected_amplitudes[goodhit_cut,:,:],axis=2),axis=1)
         reflected_rays[goodhit_cut,7] = (-np.sum(np.diff(np.conj(reflected_amplitudes[goodhit_cut,:,:]) * reflected_amplitudes[goodhit_cut,:,:],1,2),axis=1))[:,0]
@@ -214,10 +214,10 @@ def RefractionReflectionAtInterface(incoming_rays, surface_normals, n1, n2, tir_
             refracted_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)), 6:10] = reflected_rays[np.logical_and(total_internal_reflection_cut, (tir_handling>=0)),6:10] * np.matlib.repmat(tir_handling[np.logical_and(total_internal_reflection_cut, (tir_handling>=0))],1,4)
 
     # %% all done!
-    print("incoming: " + str(incoming_rays[:]))
-    print("reflected: " + str(reflected_rays[:]))
-    print("refracted: " + str(refracted_rays[:]))
-    print("refracted check: " + str(refracted_rays[:, 0:3]) + str(refracted_rays[:, 6]))
+    # print("incoming: " + str(incoming_rays[:]))
+    # print("reflected: " + str(reflected_rays[:]))
+    # print("refracted: " + str(refracted_rays[:]))
+    # print("refracted check: " + str(refracted_rays[:, 0:3]) + str(refracted_rays[:, 6]))
     print("\n")
     return [refracted_rays, reflected_rays]
     

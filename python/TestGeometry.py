@@ -45,7 +45,7 @@ def TestGeometry(z_in):
     bot_cyl.description = 'bottom cylinder along z-axis, 10cm radius from z=0 to z=5'
     bot_cyl.shape = 'cylinder'
     bot_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
-    bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (np.size(p, 0), -1))
+    bot_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > 0) * (p[:, 2, :] < 5), (p.shape[0], -1))
     bot_cyl.n_outside = 1.5
     bot_cyl.n_inside = 1.5
     bot_cyl.surface_type = 'unified'
@@ -58,7 +58,7 @@ def TestGeometry(z_in):
     top_cyl.description = 'top cylinder along z-axis, 10cm radius from z=5 to z=10'
     top_cyl.shape = 'cylinder'
     top_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
-    top_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] >= 5) * (p[:, 2, :] < 10), (np.size(p, 0), -1))
+    top_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] >= 5) * (p[:, 2, :] < 10), (p.shape[0], -1))
     top_cyl.n_outside = 1.5
     top_cyl.n_inside = 2
     top_cyl.surface_type = 'unified'
@@ -84,7 +84,7 @@ def TestGeometry(z_in):
     mid.description = 'middle disk centered on z-axis with radius 10 and z=5'
     mid.shape = 'plane'
     mid.param_list = [np.array([0, 0, 5]), np.array([0, 0, 1])]
-    mid.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
+    mid.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (p.shape[0], -1))
     mid.n_outside = 2
     mid.n_inside = 1.5
     mid.surface_type = 'normal'
@@ -96,7 +96,7 @@ def TestGeometry(z_in):
     bottom.description = 'bottom cap, disk centered on z-axis with radius 10 and z=0'
     bottom.shape = 'plane'
     bottom.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1])]
-    bottom.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (np.size(p, 0), -1))
+    bottom.inbounds_function = lambda p: np.reshape((p[:, 0] ** 2 + p[:, 1] ** 2 < 100), (p.shape[0], -1))
     bottom.n_outside = 1.5
     bottom.n_inside = 1.5
     bottom.surface_type = 'normal'
@@ -115,6 +115,7 @@ def main():
     absorbed_bot = []
     absorbed_top = []
 
+    """
     for i in range(1): # test a bunch of times
         for z in np.arange(.2, .4, .2): # move z up the center of cylinder in steps of 0.2
             [starts, rays, surfaces] = TestGeometry(z)
@@ -132,6 +133,11 @@ def main():
 
 
     ri_data = np.array(ri_data)
+    """
+
+    [starts, rays, surfaces] = TestGeometry(7)
+    [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(starts, rays, surfaces)
+    report(ray_interfaces, absorption_table, raytable, epsilon)
 
 
     # # plot

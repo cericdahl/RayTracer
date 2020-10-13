@@ -145,11 +145,11 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
         interface_normals[goodinterface_cut,:] = interface_normals[goodinterface_cut,:] / np.matlib.repmat(sin_incident_angle[goodinterface_cut, np.newaxis],1,3)
 
     if np.any(~goodinterface_cut):
-        tmp_inorms = np.cross(np.matlib.repmat([1,0,0], np.sum(not goodinterface_cut), 1), surface_normals[not goodinterface_cut, :], axis=1)
-        tmp_norms_good = np.sum(tmp_inorms**2, 2)>0
-        tmp_inorms2 = np.cross(np.matlib.repmat([0,1,0], np.sum(not goodinterface_cut), 1), surface_normals[not goodinterface_cut, :], axis=1)
-        tmp_inorms[not tmp_norms_good,:] = tmp_inorms2[not tmp_norms_good,:]
-        interface_normals[not goodinterface_cut,:] = tmp_inorms / np.matlib.repmat(np.abs(np.sqrt(np.sum(tmp_inorms**2, 1))), 1, 3)
+        tmp_inorms = np.cross(np.matlib.repmat([1,0,0], np.sum(~goodinterface_cut), 1), surface_normals[~goodinterface_cut, :], axis=1)
+        tmp_norms_good = np.sum(tmp_inorms**2, axis=1)>0
+        tmp_inorms2 = np.cross(np.matlib.repmat([0,1,0], np.sum(~goodinterface_cut), 1), surface_normals[~goodinterface_cut, :], axis=1)
+        tmp_inorms[~tmp_norms_good,:] = tmp_inorms2[~tmp_norms_good,:]
+        interface_normals[~goodinterface_cut,:] = tmp_inorms / np.matlib.repmat(np.abs(np.sqrt(np.sum(tmp_inorms**2, 1)))[:,np.newaxis], 1, 3)
 
     # %% and complete the local bases of (interface_normal, interface_yaxis, surface_normal)
     interface_yaxis = np.cross(surface_normals, interface_normals, axis=1)
@@ -166,19 +166,19 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
         still_crossing = np.copy(still_scattering)
         while np.any(still_crossing):
             # % First find a microfacet
-            print("reflected check 2: " + str(reflected_rays))
+            #print("reflected check: " + str(reflected_rays))
             facet_normals = GetFacetNormal(reflected_rays[still_crossing, 0:3], surface_normals[still_crossing,:], interface_normals[still_crossing,:], interface_yaxis[still_crossing,:], reflector_params[still_crossing,0])
 
             #print(np.any(np.isnan(reflected_rays[still_crossing, :])))
             # % then get refrations/reflections off of this facet   | getting NaNs from here, reflected_rays[still_crossing, :] has Nan(s) after first iteration
             [this_refractedray, this_reflectedray] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(reflected_rays[still_crossing, :], facet_normals, n1[still_crossing], n2[still_crossing])
-            print("this refracted: " + str(this_refractedray))
-            print("this reflected: " + str(this_reflectedray))
+            #print("this refracted: " + str(this_refractedray))
+            #print("this reflected: " + str(this_reflectedray))
         
             # % roll dice to see whether we're following the refraction or the
             # % reflection
             reflect_here = (np.random.random_sample((np.size(facet_normals,0),1)) > (this_refractedray[:,6] / (this_refractedray[:,6] + this_reflectedray[:,6]))[:,np.newaxis]).flatten() # for indexing
-            print("reflect here: " + str(reflect_here))
+            #print("reflect here: " + str(reflect_here))
             
             if np.any(np.isnan(this_refractedray[:])):
                 print('whoops! -- this_refractedray has NaN elements')
@@ -187,10 +187,9 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
             
             # % renormalize refracted/reflected intensities to the initial ray  | causing NaNs; 0 * inf = nan | nan_to_num?
             this_refractedray[:,6:10] = this_refractedray[:,6:10] * np.matlib.repmat((reflected_rays[still_crossing,6]/this_refractedray[:,6])[:,np.newaxis], 1, 4)
-            print("this refracted norm: " + str(this_refractedray))
-            print("divide check: " + str(np.matlib.repmat(np.divide(reflected_rays[still_crossing,6], this_reflectedray[:,6])[:,np.newaxis], 1, 4)))
+            #print("this refracted norm: " + str(this_refractedray))
             this_reflectedray[:,6:10] = this_reflectedray[:,6:10] * np.matlib.repmat((reflected_rays[still_crossing,6]/this_reflectedray[:,6])[:,np.newaxis], 1, 4) # here, s0 this_reflected=0
-            print("this reflected norm: " + str(this_reflectedray))
+            #print("this reflected norm: " + str(this_reflectedray))
             
             if np.any(np.isnan(this_refractedray[~reflect_here, 6])): # this is being called
                 print('whoops refracted!')
@@ -202,6 +201,7 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
             flipsides[still_crossing] = ~reflect_here
             samesides = np.copy(still_crossing)
             samesides[still_crossing] = reflect_here
+            #print("samesides? " + str(np.any(samesides==True)))
 
             # % first handle refracted rays
             if np.any(flipsides):
@@ -222,6 +222,7 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
                 diffuse_reflection = ~np.logical_or.reduce((facet_reflection, smooth_reflection, back_reflection))
 
                 if np.any(facet_reflection):
+                    #print("facet")
                     facet_ref = np.copy(samesides)
                     facet_ref[samesides] = facet_reflection
                     facet_ref_short = np.copy(reflect_here)
@@ -231,37 +232,40 @@ def UnifiedReflectorModel(incoming_rays, surface_normals, n1, n2, reflector_para
     
                 
                 if np.any(smooth_reflection):
+                    #print("smooth")
                     smooth_ref = np.copy(samesides)
                     smooth_ref[samesides] = smooth_reflection
                     [throwaway_var, theserays] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(reflected_rays[smooth_ref, :], surface_normals[smooth_ref, :], n1[smooth_ref], n2[smooth_ref])
-                    print("theserays smooth: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays smooth: " + str(np.any(np.isnan(theserays))))
                     theserays[:, 6:10] = theserays[:, 6:10] * np.matlib.repmat((reflected_rays[smooth_ref, 6] / theserays[:, 6])[:,np.newaxis], 1, 4)
-                    print("theserays smooth: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays smooth: " + str(np.any(np.isnan(theserays))))
                     if np.any(np.isnan(theserays[:])):
                         print('whoops smooth!')
                     reflected_rays[smooth_ref, :] = theserays
                     still_crossing[smooth_ref] = False
                 
                 if np.any(back_reflection):
+                    #print("back")
                     back_ref = np.copy(samesides)
                     back_ref[samesides] = back_reflection
                     [throwaway_var, theserays] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(reflected_rays[back_ref, :], -reflected_rays[back_ref, 0:3], n1[back_ref], n2[back_ref])
-                    print("theserays refl: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays refl: " + str(np.any(np.isnan(theserays))))
                     theserays[:, 6:10] = theserays[:, 6:10] * np.matlib.repmat(reflected_rays[back_ref, 6] / theserays[:, 6], 1, 4)
-                    print("theserays refl: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays refl: " + str(np.any(np.isnan(theserays))))
                     if np.any(np.isnan(theserays[:])):
                         print('whoops back!')
                     reflected_rays[back_ref, :] = theserays
                     still_crossing[back_ref] = False
                 
                 if np.any(diffuse_reflection):
+                    #print("diffuse")
                     diffuse_ref = np.copy(samesides)
                     diffuse_ref[samesides] = diffuse_reflection
                     diffuse_normal = np.array(GetLambertianNormal(reflected_rays[diffuse_ref, 0:3], surface_normals[diffuse_ref,:], interface_normals[diffuse_ref,:], interface_yaxis[diffuse_ref,:])[0])
                     [throwaway_var, theserays] = RefractionReflectionAtInterface.RefractionReflectionAtInterface(reflected_rays[diffuse_ref, :], diffuse_normal, n1[diffuse_ref], n2[diffuse_ref])
-                    print("theserays diff: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays diff: " + str(np.any(np.isnan(theserays))))
                     theserays[:, 6:10] = theserays[:, 6:10] * np.matlib.repmat((reflected_rays[diffuse_ref, 6] / theserays[:, 6])[:,np.newaxis], 1, 4)
-                    print("theserays diff: " + str(np.any(np.isnan(theserays))))
+                    #print("theserays diff: " + str(np.any(np.isnan(theserays))))
                     if np.any(np.isnan(theserays[:])):
                         print('whoops diffuse!')
                     reflected_rays[diffuse_ref, :] = theserays

@@ -27,6 +27,7 @@ import numpy as np
 import numpy.matlib
 
 def RayToQuadSurface(starting_points, indir, q, p, r):
+    params = len(locals())
 
     intersection_points = []
     surface_normals = []
@@ -34,7 +35,7 @@ def RayToQuadSurface(starting_points, indir, q, p, r):
     crossing_into = []
 
     # check inputs
-    if len(sys.argv) != 5 or q.size != 9 or len(p) != 3 or r.size != 1 or starting_points.shape[1] != 3 or \
+    if params != 5 or q.size != 9 or len(p) != 3 or r.size != 1 or starting_points.shape[1] != 3 or \
             indir.shape[1] != 3 or len(starting_points) != len(indir) or len(starting_points.shape) != 2 or \
             len(indir.shape) != 2:
         raise Exception('Improper input to RayToQuadsurface')
