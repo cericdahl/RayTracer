@@ -1,10 +1,8 @@
 import numpy as np
 import math
-import random
 import RayTracer2
 import surface
 import matplotlib.pyplot as plt
-import sys
 
 # Check retroreflection in UnifiedReflectorModel with a retroreflecting panel covered in a hemisphere (for collecting
 # distribution). Fire light straight down onto the center of the panel and observe distribution on hemisphere.
@@ -34,17 +32,19 @@ def main():
     panel.n_outside = 1.5
     panel.n_inside = np.inf
     panel.surface_type = 'unified'
-    panel.unifiedparams = [0, 0, 0, 0, 0]
+    panel.unifiedparams = [0, 0, 1, 0, 0]
     panel.absorption = 0
     surface_list.append(panel)
+    print("size test: " + str(np.size(panel.unifiedparams)))
 
     # construct light rays
-    # start them along z-axis, pointing down
-    x = 0
+    # start them along z-axis, pointing down for normal incidence
+    # start at (-5, 0, 5), pointing towards origin for 45 degree incidence
+    x = -5
     y = 0
     z = 5
 
-    n = 10000  # number of rays
+    n = 1000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x
@@ -57,30 +57,33 @@ def main():
     test_rays[..., 3] = 1
     test_rays[..., 6] = 1
 
-    test_rays[:, 0] = 0
+    test_rays[:, 0] = 1
     test_rays[:, 1] = 0
     test_rays[:, 2] = -1
 
-    #print(test_rays)
-
     [ray_interfaces, absorption_table, raytable] = RayTracer2.RayTracer2(ray_startpoints, test_rays, surface_list)
 
-    # print("Points of intersection:")
-    # print(ray_interfaces[1].intersection_point)
-    # print(ray_interfaces[1].intersection_point.shape)
 
+    # PLOT
     # calculate spherical coordinates
     x_int = ray_interfaces[1].intersection_point[:, 0]
     y_int = ray_interfaces[1].intersection_point[:, 1]
     z_int = ray_interfaces[1].intersection_point[:, 2]
 
-    theta = np.arctan((np.sqrt(x_int**2 + y_int**2) / z_int)) # 0 < theta < pi/2
-    phi = np.arctan(y_int / x_int) # 0 < phi < 2pi PROBLEM HERE: ARCTAN ONLY FROM -pi/2 --> pi/2
+    theta = np.arctan2(np.sqrt(x_int**2 + y_int**2), z_int) # 0 < theta < pi/2
+    phi = np.arctan2(y_int, x_int) # -pi < phi < pi
     phi[np.isnan(phi)] = 0
+    phi = (phi + 2 * math.pi) % (2 * math.pi) # convert to 0 < phi < 2pi
 
-    points = np.concatenate((phi[:,np.newaxis], np.cos(theta)[:,np.newaxis]), axis=1)
-    counts = np.equal(points, np.matlib.repmat(np.array([0, 1]), points.shape[0], 1))
-    print("# of Rays Perfectly Reflected: " + str(int(np.sum(counts)/2)))
+    # spherical coords of initial rays
+    theta_0 = np.matlib.repmat(np.cos(np.arctan2(np.sqrt(x ** 2 + y ** 2), z)), len(theta), 1)
+    phi_0 = np.matlib.repmat(np.arctan2(y, x), len(theta), 1)
+    phi_0[np.isnan(phi_0)] = 0
+    #phi_0 = (phi_0 + 2 * math.pi) % (2 * math.pi)
+
+    # Perfect Reflection Check
+    points = np.concatenate((phi[:, np.newaxis], np.cos(theta)[:, np.newaxis]), axis=1)
+    counts = np.equal(points, np.concatenate((phi_0, np.cos(theta_0)), axis=1)) # cos(theta), phi the same
 
     fig, ax = plt.subplots()
     ax.scatter(phi, np.cos(theta))
@@ -89,28 +92,17 @@ def main():
     plt.ylim(0, 1)
 
     ax.set_ylabel("cos\u03B8") # theta
-    ax.set_xlabel("\u03C6") # phi
+    ax.set_xlabel("\u03C6  (azimuth)") # phi
     ax.grid(True)
 
-    plt.show()
+    print("intersection: " + str(ray_interfaces[1].intersection_point))
+    print("points: " + str(points))
+    print("counts: " + str(counts))
+    print("check: " + str(np.concatenate((phi_0, np.cos(theta_0)), axis=1)))
 
-    # # plot
-    # x_data = np.arange(.2, 10, .2)
-    # width = 0.05
-    # labels = np.arange(.2, 10, .2).round(decimals=1) # fix x-labels
-    #
-    # fig, ax = plt.subplots()
-    #
-    # ax.bar(x_data, absorbed_bot, width, label='absorbed bottom')
-    # ax.bar(x_data, absorbed_top, width, bottom=absorbed_bot, label='absorbed top')
-    # plt.xticks(np.arange(.2, 10, .2), labels, size='small', rotation='vertical')
-    #
-    # ax.set_ylabel('# of rays absorbed')
-    # ax.set_xlabel('z-start')
-    # ax.set_title('# of rays absorbed at caps by starting height')
-    # ax.legend()
-    #
-    # plt.show()
+    plt.text(.96, .08, "# rays perfectly reflected = {}".format(int(np.sum(counts))), bbox={'facecolor':'w','pad':5}, ha="right", va="top", transform=plt.gca().transAxes) #check the counts/2
+
+    plt.show()
 
 
 

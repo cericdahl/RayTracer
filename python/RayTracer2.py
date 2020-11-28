@@ -235,11 +235,16 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
         for i_p in range(np.size(bulk_props)):
         
             #this doesnt need to be a try statement because python uses short circuiting when evaluating boolean statements
-            if ((not hasattr(surfacelist, bulk_props[i_p])) or (np.size(getattr(surfacelist[i_s],bulk_props[i_p])) == 0)):
+            if ((~hasattr(surfacelist, bulk_props[i_p])) or (np.size(getattr(surfacelist[i_s],bulk_props[i_p])) == 0)):
                 setattr(surfacelist[i_s],bulk_props[i_p],np.inf)
 
         
-        if (not hasattr(surfacelist, 'unifiedparams') or (np.size(surfacelist[i_s].unifiedparams) == 0)):
+        # if (~hasattr(surfacelist, 'unifiedparams') or (np.size(surfacelist[i_s].unifiedparams) == 0)):
+        #     surfacelist[i_s].unifiedparams = [0, 1, 0, 1, 0]
+        try: # above was replacing ALL unifiedparams with [0, 1, 0, 1, 0]
+            getattr(surfacelist[i_s], 'unifiedparams')
+            print(getattr(surfacelist[i_s], 'unifiedparams'))
+        except AttributeError:
             surfacelist[i_s].unifiedparams = [0, 1, 0, 1, 0]
 
 #    %% now really set default tir_handling
@@ -365,7 +370,9 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             abs_next[scatter_here] = surfacelist[n].absorption
             six_next[scatter_here] = n * s_orientation[scatter_here[:, np.newaxis]] # Turned scatter_here from n,  to n,1
             surfacetype_next[scatter_here] = int_surfacetype
+            #print("params: " + str(np.array(surfacelist[n].unifiedparams)))
             unifiedsurface_next[scatter_here,:] = np.matlib.repmat(np.array(surfacelist[n].unifiedparams), np.sum(scatter_here), 1)
+            #print("unified: " + str(unifiedsurface_next))
         #end loop through surfaces
         
         
