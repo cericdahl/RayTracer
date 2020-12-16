@@ -401,7 +401,7 @@ def RayTracer2(ray_startingpoints, rays, surfacelist = [], max_scat = 10, min_tr
             
 
 #        %% Now determine which rays get absorbed, rayleigh scattered, or surface scattered
-        scatter_cut = np.logical_or((l_next < np.inf), (rayleigh_next[:,0] < np.inf)) # ? | FALSE
+        scatter_cut = np.logical_or((l_next < np.inf), (rayleigh_next[:,0] < np.inf))
         if not np.any(scatter_cut):
             ray_index = []
             continue #move to next scatter

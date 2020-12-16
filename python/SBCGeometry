@@ -1,0 +1,175 @@
+"""SBC Geometry in RayTracer style, adapted from SBC_MCNP_Eu148_vised.i"""
+import numpy as np
+import math
+import random
+import RayTracer2
+import surface
+import matplotlib.pyplot as plt
+
+# Material Parameters
+n_argon = 1.45 # arXiv:1502.04213v4
+n_cf4 = 1.0004823 # gaseous!!! can't find liquid
+n_fused_quartz = 1.4424
+
+void = np.inf
+
+# n_copper
+n_ss_304L = 2.75681  # typical value, not specific to 304L: https://www.filmetrics.com/refractive-index-database/Stainless-Steel#:~:text=For%20a%20typical%20sample%20of,nm%20are%202.75681%20and%203.792016.
+# n_beryl
+# n_air
+# n_hdpe
+
+"""REMEMBER = IN INEQUALITIES TO AVOID ESCAPING RAYS"""
+
+surface_list = []
+
+# Beryllium Puck
+# Inner Jar
+inner_jar_density = -2.203
+
+inner_jar_inner_cyl = surface.surface()
+inner_jar_inner_cyl.description = 'inner jar inner cylindrical wall'
+inner_jar_inner_cyl.shape = 'cylinder'
+inner_jar_inner_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10]
+inner_jar_inner_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -66.40278) * (p[:, 2, :] < -21.61143), (p.shape[0], -1))
+inner_jar_inner_cyl.n_outside = n_fused_quartz
+inner_jar_inner_cyl.n_inside = n_cf4
+inner_jar_inner_cyl.surface_type = ''
+inner_jar_inner_cyl.absorption = 0
+surface_list.append(inner_jar_inner_cyl)
+
+inner_jar_outer_cyl = surface.surface()
+inner_jar_outer_cyl.description = 'inner jar outer cylindrical wall'
+inner_jar_outer_cyl.shape = 'cylinder'
+inner_jar_outer_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 10.5]
+inner_jar_outer_cyl.inbounds_function = lambda p: np.reshape((p[:,2,:] > -66.40278) * (p[:,2,:] < -21.61143), (p.shape[0], -1))
+inner_jar_outer_cyl.n_outside = n_argon
+inner_jar_outer_cyl.n_inside = n_fused_quartz
+inner_jar_outer_cyl.surface_type = ''
+inner_jar_outer_cyl.absorption = 0
+surface_list.append(inner_jar_outer_cyl)
+
+# will have to split up above into different sections with insulation rather than CF4 as the previous/next material
+
+inner_jar_inner_dome = surface.surface()
+inner_jar_inner_dome.description = 'inner jar inner dome'
+inner_jar_inner_dome.shape = 'sphere'
+inner_jar_inner_dome.param_list = [np.array([0, 0, -37.9745]), 20.5]
+inner_jar_inner_dome.inbounds_function = lambda p: np.reshape((p[:,2,:] > -21.61143), (p.shape[0], -1)) # < needed too ? | shouldnt need -111 radius of cylinder
+inner_jar_inner_dome.n_outside = n_fused_quartz
+inner_jar_inner_dome.n_inside = n_cf4
+inner_jar_inner_dome.surface_type = ''
+inner_jar_inner_dome.absorption = 0
+surface_list.append(inner_jar_inner_dome)
+
+inner_jar_outer_dome = surface.surface()
+inner_jar_outer_dome.description = 'inner jar outer dome'
+inner_jar_outer_dome.shape = 'sphere'
+inner_jar_outer_dome.param_list = [np.array([0, 0, -37.9745]), 21.0]
+inner_jar_outer_dome.inbounds_function = lambda p: np.reshape((p[:,2,:] > -21.61143), (p.shape[0], -1))
+inner_jar_outer_dome.n_outside = n_argon
+inner_jar_outer_dome.n_inside = n_fused_quartz
+inner_jar_outer_dome.surface_type = ''
+inner_jar_outer_dome.absorption = 0
+surface_list.append(inner_jar_outer_dome)
+
+
+inner_jar_knucklet = surface.surface()
+#above 8.54167 radius and below 8.75 radius, above 301 torus, below inner jar outer dome, above z -21.61143
+
+inner_jar_knuckle = surface.surface()
+#above 8.75 radius, above 301 torus, below 302 torus, above z -21.61143
+
+
+# Outer Jar
+outer_jar_inner_cyl = surface.surface()
+outer_jar_inner_cyl.description = 'outer jar inner cylindrical wall'
+outer_jar_inner_cyl.shape = 'cylinder'
+outer_jar_inner_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 11.5]
+outer_jar_inner_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -66.40278) * (p[:, 2, :] < 0), (p.shape[0], -1))
+outer_jar_inner_cyl.n_outside = n_fused_quartz
+outer_jar_inner_cyl.n_inside = n_argon
+outer_jar_inner_cyl.surface_type = ''
+outer_jar_inner_cyl.absorption = 0
+surface_list.append(outer_jar_inner_cyl)
+
+outer_jar_outer_cyl = surface.surface()
+outer_jar_outer_cyl.description = 'outer jar outer cylindrical wall'
+outer_jar_outer_cyl.shape = 'cylinder'
+outer_jar_outer_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 12]
+outer_jar_outer_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -66.40278) * (p[:, 2, :] < 0), (p.shape[0], -1))
+outer_jar_outer_cyl.n_outside = n_cf4
+outer_jar_outer_cyl.n_inside = n_fused_quartz
+outer_jar_outer_cyl.surface_type = ''
+outer_jar_outer_cyl.absorption = 0
+surface_list.append(outer_jar_outer_cyl)
+
+#same as above, split cylinders
+
+outer_jar_inner_dome = surface.surface()
+outer_jar_inner_dome.description = 'outer jar inner dome'
+outer_jar_inner_dome.shape = 'sphere'
+outer_jar_inner_dome.param_list = [np.array([0, 0, -18.3303]), 23.5]
+outer_jar_inner_dome.inbounds_function = lambda p: np.reshape((p[:,2,:] > 0), (p.shape[0], -1)) # < needed too ?
+outer_jar_inner_dome.n_outside = n_fused_quartz
+outer_jar_inner_dome.n_inside = n_argon
+outer_jar_inner_dome.surface_type = ''
+outer_jar_inner_dome.absorption = 0
+surface_list.append(outer_jar_inner_dome)
+
+outer_jar_outer_dome = surface.surface()
+outer_jar_outer_dome.description = 'outer jar outer dome'
+outer_jar_outer_dome.shape = 'sphere'
+outer_jar_outer_dome.param_list = [np.array([0, 0, -18.3303]), 24]
+outer_jar_outer_dome.inbounds_function = lambda p: np.reshape((p[:,2,:] > 0), (p.shape[0], -1)) # < needed too ?
+outer_jar_outer_dome.n_outside = n_cf4
+outer_jar_outer_dome.n_inside = n_fused_quartz
+outer_jar_outer_dome.surface_type = ''
+outer_jar_outer_dome.absorption = 0
+surface_list.append(outer_jar_outer_dome)
+
+#knuckle
+#knucklet
+
+
+# Pressure Vessel
+"""
+pv_flange = surface.surface()
+pv_flange.description = 'pressure vessel flange'
+pv_flange.shape = 'cylinder'
+pv_flange.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 30.48]
+pv_flange.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -79.10278) * (p[:, 2, :] < -66.40278), (p.shape[0], -1))
+pv_flange.n_outside = 
+pv_flange.n_inside =
+"""
+
+pv_inner_cyl = surface.surface()
+pv_inner_cyl.description = 'pressure vessel inner cylinder wall'
+pv_inner_cyl.shape = 'cylinder'
+pv_inner_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 19.36750]
+pv_inner_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -66.40278) * (p[:, 2, :] < 8.39895), (p.shape[0], -1))
+pv_inner_cyl.n_outside = n_ss_304L
+pv_inner_cyl.n_inside = n_cf4 # complicated with insulation
+pv_inner_cyl.surface_type = ''
+pv_inner_cyl.absorption = 0
+surface_list.append(pv_inner_cyl)
+
+pv_outer_cyl = surface.surface()
+pv_outer_cyl.description = 'pressure vessel outer cylinder wall'
+pv_outer_cyl.shape = 'cylinder'
+pv_outer_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 20.32000]
+pv_outer_cyl.inbounds_function = lambda p: np.reshape((p[:, 2, :] > -66.40278) * (p[:, 2, :] < 8.39895), (p.shape[0], -1))
+pv_outer_cyl.n_outside = void
+pv_outer_cyl.n_inside = n_ss_304L
+pv_outer_cyl.surface_type = ''
+pv_outer_cyl.absorption = 0
+surface_list.append(pv_outer_cyl)
+
+#knuckle
+#knucklet
+
+
+# Insulation
+# Hydraulic Spaces ?
+# Bellows ?
+
