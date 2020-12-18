@@ -32,7 +32,7 @@ def main():
     panel.n_outside = 1.5
     panel.n_inside = np.inf
     panel.surface_type = 'unified'
-    panel.unifiedparams = [0, 0, 1, 0, 0]
+    panel.unifiedparams = [0, 0, .25, .5, .1]
     panel.absorption = 0
     surface_list.append(panel)
     print("size test: " + str(np.size(panel.unifiedparams)))
@@ -44,7 +44,7 @@ def main():
     y = 0
     z = 5
 
-    n = 1000  # number of rays
+    n = 1000000  # number of rays
 
     ray_startpoints = np.empty((n, 3))
     ray_startpoints[..., 0] = x

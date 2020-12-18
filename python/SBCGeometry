@@ -19,7 +19,7 @@ n_ss_304L = 2.75681  # typical value, not specific to 304L: https://www.filmetri
 # n_air
 # n_hdpe
 
-"""REMEMBER = IN INEQUALITIES TO AVOID ESCAPING RAYS"""
+"""REMEMBER = IN INEQUALITIES TO AVOID ESCAPING RAYS, SURFACE TYPE, UNIFIEDPARAMS"""
 
 surface_list = []
 
@@ -73,8 +73,10 @@ inner_jar_outer_dome.surface_type = ''
 inner_jar_outer_dome.absorption = 0
 surface_list.append(inner_jar_outer_dome)
 
-
+# knuckles and knucklets will be complex geometries of four surfaces each, 2 cut out of toruses and 2 cylinders
 inner_jar_knucklet = surface.surface()
+inner_jar_knucklet.description = 'inner jar knucklet'
+inner_jar_knucklet.shape = ''
 #above 8.54167 radius and below 8.75 radius, above 301 torus, below inner jar outer dome, above z -21.61143
 
 inner_jar_knuckle = surface.surface()
@@ -132,7 +134,7 @@ surface_list.append(outer_jar_outer_dome)
 #knucklet
 
 
-# Pressure Vessel
+# Pressure Vessel -- LIGHT DOES GO THRU THE INSULATION!!!
 """
 pv_flange = surface.surface()
 pv_flange.description = 'pressure vessel flange'
@@ -154,7 +156,7 @@ pv_inner_cyl.surface_type = ''
 pv_inner_cyl.absorption = 0
 surface_list.append(pv_inner_cyl)
 
-pv_outer_cyl = surface.surface()
+pv_outer_cyl = surface.surface() # do we even need to consider anything that transmits into the SS?
 pv_outer_cyl.description = 'pressure vessel outer cylinder wall'
 pv_outer_cyl.shape = 'cylinder'
 pv_outer_cyl.param_list = [np.array([0, 0, 0]), np.array([0, 0, 1]), 20.32000]
@@ -170,6 +172,9 @@ surface_list.append(pv_outer_cyl)
 
 
 # Insulation
+
+
+
 # Hydraulic Spaces ?
 # Bellows ?
 
