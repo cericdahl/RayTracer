@@ -23,7 +23,6 @@ n_ss_304L = 2.75681  # typical value, not specific to 304L: https://www.filmetri
 
 surface_list = []
 
-# Beryllium Puck
 # Inner Jar
 inner_jar_density = -2.203
 
@@ -73,6 +72,7 @@ inner_jar_outer_dome.surface_type = ''
 inner_jar_outer_dome.absorption = 0
 surface_list.append(inner_jar_outer_dome)
 
+# knuckles and knucklets of both jars may not be needed; below insulation
 # knuckles and knucklets will be complex geometries of four surfaces each, 2 cut out of toruses and 2 cylinders
 inner_jar_knucklet = surface.surface()
 inner_jar_knucklet.description = 'inner jar knucklet'
@@ -134,7 +134,7 @@ surface_list.append(outer_jar_outer_dome)
 #knucklet
 
 
-# Pressure Vessel -- LIGHT DOES GO THRU THE INSULATION!!!
+# Pressure Vessel -- HDPE does have a refractive index, but cameras do not see past insulation so no need to see past it
 """
 pv_flange = surface.surface()
 pv_flange.description = 'pressure vessel flange'
